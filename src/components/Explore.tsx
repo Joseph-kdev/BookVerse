@@ -1,20 +1,10 @@
-import React, { act, useEffect, useReducer, useState } from 'react'
+import React, { useEffect, useReducer, useState } from 'react'
 import { getGenreBooks } from '../services/requests';
-import { GoogleBook } from '../types';
 import Book from './Book';
 import _ from "lodash"
 import Nav from './Nav';
+import { booksReducer } from '../config/reducers';
 
-const reducer = (books: GoogleBook[] , action) => {
-  switch (action.type) {
-    case "GENRE-CHANGE":
-      return [...action.payload];
-    case "Error":
-      return []
-    default:
-      return books;
-  }
-}
 export default function Explore() {
   const [activeTab, setActiveTab] = useState("our-picks");
   const [selectedGenre, setSelectedGenre] = useState("")
@@ -79,7 +69,7 @@ export default function Explore() {
     ],
   }
 
-  const [books, dispatch] = useReducer(reducer, [])
+  const [books, dispatch] = useReducer(booksReducer, [])
 
   const findGenreBooks = async(genre: string) => {
     setIsLoading(true)

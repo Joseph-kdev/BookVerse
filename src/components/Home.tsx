@@ -1,6 +1,7 @@
 import Nav from './Nav'
 import { useQuery } from '@tanstack/react-query'
 import { getBestSellers } from '../services/requests'
+import { Link } from 'react-router-dom'
 
 export default function Home() {
     const { data, isLoading, isError } = useQuery({
@@ -29,7 +30,9 @@ export default function Home() {
                         </p>
                     </div>
                     <button className='bg-white mt-2'>
-                        Get Started
+                        <Link to="/login">
+                            Get Started
+                        </Link>
                     </button>
                 </div>
             </div>
