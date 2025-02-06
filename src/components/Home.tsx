@@ -20,7 +20,7 @@ export default function Home() {
         <Nav/>
         <section className='h-[50vh] flex justify-center items-center mx-1'>
             <div className='flex justify-center items-center'>
-                <div className='min-w-[340px] min-h-[300px] mx-1 bg-[rgba(255,255,255,0.86)] md:w-[82vw] md:h-[50%] flex flex-col justify-center items-center'>
+                <div className='min-w-[340px] min-h-[300px] mx-1 bg-background md:w-[82vw] md:h-[50%] flex flex-col justify-center items-center'>
                     <div>
                         <h1 className='text-center text-3xl mb-3'>
                             Curate your E-BookShelf

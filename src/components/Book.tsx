@@ -39,7 +39,7 @@ export default function Book({
   const [modalIsOpen, setIsOpen] = useState(false);
   const [showSelect, setShowSelect] = useState(false);
   const { user } = useUserAuthContext();
-  const [bookInCollection, setBookInCollection] = useState({'reading-list': false, 'read':false});
+  const [bookInCollection, setBookInCollection] = useState({'reading-list': false, 'already-read':false, 'favorite':false});
   const truncateTitle = (title: string, maxLength: number): string => {
     if (!title) {
       return "";
@@ -123,7 +123,8 @@ export default function Book({
       };
   
       await checkList('reading-list');
-      await checkList('read');
+      await checkList('already-read');
+      await checkList('favorite')
     };
   
     checkBookExistence();
@@ -154,8 +155,24 @@ export default function Book({
         <div className="flex gap-2 items-start max-w-[500px]">
           <div className="min-w-[100px]">
             <img src={imageLinks?.thumbnail} alt={title} />
-            <div className="mt-3">
-              <svg
+            <div className="mt-3 cursor-pointer" onClick={() => toggleBookLibrary("favorite", bookInCollection['favorite'] ? "remove" : "add")}>
+              {bookInCollection['favorite'] ? (
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="red"
+                  viewBox="0 0 24 24"
+                  strokeWidth={1.5}
+                  stroke="currentColor"
+                  className="size-6"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"
+                  />
+                </svg>
+              ) : (
+                <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
@@ -169,6 +186,7 @@ export default function Book({
                   d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"
                 />
               </svg>
+              )}
             </div>
           </div>
           <div>
@@ -188,7 +206,7 @@ export default function Book({
             onClick={() => setShowSelect(!showSelect)}
             className="m-1 bg-gray-900 p-2 rounded-md"
           >
-            {bookInCollection ? "Remove from Library" : "Add to Library"}
+            {bookInCollection["already-read"] || bookInCollection["reading-list"] ? "Remove from Library" : "Add to Library"}
           </button>
           <button className="m-1 bg-gray-900 p-2 rounded-md">More</button>
         </div>
@@ -205,7 +223,7 @@ export default function Book({
             <button className="bg-pink-400 m-1 p-2 rounded-md" onClick={() => toggleBookLibrary("reading-list", bookInCollection["reading-list"] ? "remove" : "add")}>
               {bookInCollection["reading-list"] ? "Remove" : "Reading list"}
             </button>
-            <button className="bg-pink-400 m-1 p-2 rounded-md" onClick={() => toggleBookLibrary("already-read", bookInCollection["read"] ? "remove" : "add")}>{bookInCollection["read"] ? "Remove" : "Already Read"}</button>
+            <button className="bg-pink-400 m-1 p-2 rounded-md" onClick={() => toggleBookLibrary("already-read", bookInCollection["already-read"] ? "remove" : "add")}>{bookInCollection["already-read"] ? "Remove" : "Already Read"}</button>
           </div>
         </div>
       </Modal>

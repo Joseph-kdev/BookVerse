@@ -4,6 +4,7 @@ import Home from './components/Home'
 import Explore from './components/Explore'
 import Search from './components/Search'
 import Login from './components/Login'
+import Library from './components/Library'
 
 export default function App() {
   return (
@@ -13,6 +14,7 @@ export default function App() {
         <Route path='/explore' element={<Explore />} />
         <Route path='/search' element={<Search />} />
         <Route path='/login' element={<Login />} />
+        <Route path='/library' element={<Library />} />
       </Routes>
     </Router>
   )

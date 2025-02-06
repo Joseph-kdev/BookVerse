@@ -16,7 +16,7 @@ export interface GoogleBook {
     authors?: string[];
     description: string;
     imageLinks?: imageLinks;
-    publisher: string;
+    publisher?: string;
     categories: string[];
 }
 
