@@ -98,14 +98,14 @@ export default function Explore() {
   }, [activeTab])
   
   return (
-    <>
+    <section className='bg-light-background dark:bg-dark-background'>
     <Nav />
-      <div className="w-full md:max-w-3xl mx-auto lg:grid lg:grid-cols-3 lg:min-w-full lg:p-4">
+      <div className="w-full md:max-w-3xl mx-auto lg:grid lg:grid-cols-3 lg:min-w-full lg:p-4 bg-light-background dark:bg-dark-background">
         <div className='mt-3 lg:col-span-1 lg:fixed lg:right-8'>
           {/* Tabs Navigation */}
           <div className="relative">
             <div className="overflow-x-auto scrollbar-hide">
-              <div className="inline-flex min-w-full bg-gray-100 rounded-lg p-1 justify-evenly">
+              <div className="inline-flex min-w-full bg-light-secondary dark:bg-dark-secondary rounded-lg p-1 justify-evenly">
                 {tabs.map(tab => (
                   <button
                     key={tab.id}
@@ -113,10 +113,10 @@ export default function Explore() {
                     className={`
                       px-2 py-2 text-sm font-medium rounded-md transition-all
                       ${activeTab === tab.id 
-                        ? 'bg-white text-gray-900 shadow-sm' 
-                        : 'text-gray-600 hover:text-gray-900'
+                        ? 'bg-light-accent dark:bg-dark-accent text-light-primary dark:text-dark-primary shadow-sm' 
+                        : 'text-light-background dark:text-dark-background hover:text-gray-900'
                       }
-                      focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400
+                      focus:outline-none focus:ring-2 focus:ring-offset-2 focus:light-accent
                     `}
                   >
                     {tab.label}
@@ -127,18 +127,18 @@ export default function Explore() {
           </div>
           {/* Genre Grid */}
           <div className="">
-            <div className="flex overflow-scroll scroll-smooth lg:grid lg:grid-cols-2 lg:gap-2 lg:overflow-hidden">
+            <div className="flex overflow-scroll scroll-smooth lg:grid lg:grid-cols-2 lg:gap-2 lg:overflow-hidden mt-1">
               {genres[activeTab].map((genre: string) => (
                 <button
                   key={genre}
                   className={`
                     text-xs max-h-[50px] min-w-[150px]
                     px-2 py-2 m-1 md:text-sm font-medium
-                    bg-gray-100 hover:bg-gray-200
+                    bg-light-primary dark:bg-dark-primary hover:bg-light-accent dark:hover:bg-dark-accent
                     rounded-lg transition-colors
-                    text-gray-900
+                    text-light-background dark:text-dark-background
                     ${selectedGenre === genre 
-                      ? 'bg-yellow-300 text-gray-900 shadow-sm border border-gray-200' 
+                      ? 'bg-[#dfbf90] dark:bg-[#6f4f20] text-gray-900 shadow-sm border border-gray-200' 
                       : 'bg-gray-100 hover:bg-gray-200 text-gray-900'
                     }
                     focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2
@@ -159,6 +159,6 @@ export default function Explore() {
                   ))}
         </div>
       </div>
-    </>
+    </section>
   );
 };

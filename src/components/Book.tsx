@@ -143,7 +143,7 @@ export default function Book({
           </a>
         </div>
         <div>
-          <h3 className="mt-1">{truncateTitle(title, 40)}</h3>
+          <h3 className="mt-1 text-light-text dark:text-dark-text">{truncateTitle(title, 40)}</h3>
         </div>
       </div>
       <Modal
@@ -191,24 +191,24 @@ export default function Book({
           </div>
           <div>
             <div>
-              <h3>{truncateTitle(title, 40)}</h3>
-              <p>
+              <h3 className="font-serif text-lg md:text-xl">{truncateTitle(title, 40)}</h3>
+              <p className="font-Buda text-sm">
                 {authors?.map((author) => (
                   <p>{author},</p>
                 ))}
               </p>
-              <p>{truncateTitle(description, 200)}</p>
+              <p className="font-sans text-sm">{truncateTitle(description, 200)}</p>
             </div>
           </div>
         </div>
         <div className="w-full grid grid-cols-2">
           <button
             onClick={() => setShowSelect(!showSelect)}
-            className="m-1 bg-gray-900 p-2 rounded-md"
+            className={`m-1 text-light-background font-Tilt_Neon p-2 rounded-md ${bookInCollection["already-read"] || bookInCollection["reading-list"] ? "bg-red-500" : "bg-light-accent dark:bg-dark-accent"}`}
           >
             {bookInCollection["already-read"] || bookInCollection["reading-list"] ? "Remove from Library" : "Add to Library"}
           </button>
-          <button className="m-1 bg-gray-900 p-2 rounded-md">More</button>
+          <button className="m-1 bg-light-accent dark:bg-dark-accent p-2 rounded-md font-Tilt_Neon text-light-background">More</button>
         </div>
       </Modal>
       <Modal
@@ -218,12 +218,12 @@ export default function Book({
         style={customLibraryStyles}
       >
         <div className="min-w-[320px]">
-          <h3>Assign a tag:</h3>
+          <h3 className="font-Oxanium text-lg">Assign a tag:</h3>
           <div className="w-full grid grid-cols-2">
-            <button className="bg-pink-400 m-1 p-2 rounded-md" onClick={() => toggleBookLibrary("reading-list", bookInCollection["reading-list"] ? "remove" : "add")}>
+            <button className={`bg-pink-400 m-1 p-2 rounded-md ${bookInCollection["reading-list"] ? "bg-red-600" : "bg-light-secondary dark:bg-dark-secondary"}`} onClick={() => toggleBookLibrary("reading-list", bookInCollection["reading-list"] ? "remove" : "add")}>
               {bookInCollection["reading-list"] ? "Remove" : "Reading list"}
             </button>
-            <button className="bg-pink-400 m-1 p-2 rounded-md" onClick={() => toggleBookLibrary("already-read", bookInCollection["already-read"] ? "remove" : "add")}>{bookInCollection["already-read"] ? "Remove" : "Already Read"}</button>
+            <button className={`bg-pink-400 m-1 p-2 rounded-md ${bookInCollection["already-read"] ? "bg-red-600" : "bg-light-secondary dark:bg-dark-secondary"}`} onClick={() => toggleBookLibrary("already-read", bookInCollection["already-read"] ? "remove" : "add")}>{bookInCollection["already-read"] ? "Remove" : "Already Read"}</button>
           </div>
         </div>
       </Modal>
