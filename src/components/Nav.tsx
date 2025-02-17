@@ -7,7 +7,7 @@ export default function Nav() {
   };
   return (
     <nav className="flex justify-between p-1 md:px-4 bg-light-background dark:bg-dark-background sticky top-0 items-center text-light-background dark:text-dark-background">
-      <div className="ml-1">
+      <div className="ml-1 text-light-text dark:text-dark-text">
         <Link to="/">Logo</Link>
       </div>
       <div className="bg-light-primary dark:bg-dark-primary p-2 rounded-full w-[200px] md:min-w-[300px] flex justify-evenly">
@@ -77,7 +77,7 @@ export default function Nav() {
           </svg>
         </Link>
       </div>
-      <div className="absolute right-3 top-16 bg-light-background dark:bg-dark-background rounded-full cursor-pointer p-1">
+      <div className="absolute right-3 top-[120px] bg-light-background dark:bg-dark-background rounded-full cursor-pointer p-1">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"

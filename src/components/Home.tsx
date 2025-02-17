@@ -10,11 +10,6 @@ export default function Home() {
         initialData: [],
     })
 
-    if (isError) {
-        return <div>Error loading data</div>
-    }
-
-
   return (
     <div className='bg-[url("/homebg1.jpg")] bg-center bg-cover bg-fixed'>
         <Nav/>
@@ -23,7 +18,7 @@ export default function Home() {
                 <div className='min-w-[340px] min-h-[300px] mx-1 bg-light-background dark:bg-dark-background md:w-[82vw] md:h-[50%] flex flex-col justify-center items-center bg-opacity-70 dark:bg-opacity-90'>
                     <div>
                         <h1 className='text-center text-4xl mb-3 text-light-text dark:text-dark-text'>
-                            Curate your E-BookShelf
+                            Curate your <span className=''>E-BookShelf</span>
                         </h1>
                         <p className='mb-3 text-center text-light-text dark:text-dark-text'>
                             Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
@@ -61,8 +56,10 @@ export default function Home() {
                             <img src={book.book_image} alt="" />
                     </div>
                 ))}
-                <div>
-                    More
+                <div className='max-w-[80px] md:max-w-[120px] bg-light-secondary dark:bg-dark-secondary p-2 hover:bg-light-accent hover:text-light-text rounded-lg bg-center bg-cover'>
+                    <Link to="/explore">
+                        More
+                    </Link>
                 </div>
                 </div>
             </div>

@@ -3,6 +3,7 @@ import { BestSellers, GoogleBook } from "../types";
 
 const bestSellersUrl: string = "http://api.nytimes.com/svc/books/v3/lists/";
 const googleBooksUrl: string = "https://www.googleapis.com/books/v1/volumes";
+
 const nyt_key = import.meta.env.VITE_NYT_API_KEY;
 const google_key = import.meta.env.VITE_BOOKS_API_KEY
 
@@ -45,12 +46,13 @@ export const searchBooks = async(query: string): Promise<GoogleBook[]> => {
         throw new Error("Failed to fetch books")
     }
 }
-
   
 export const getGenreBooks = async(genre: string): Promise<GoogleBook[]> => {
 
     try {
       const response = await axios.get(`${googleBooksUrl}/?q=subject:${genre}&api-key=${google_key}&orderBy=relevance&maxResults=40`)
+      console.log(response);
+      
       const foundBooks: GoogleBook[] = response.data.items.map((item) => ({
         id: item.id,
         title: item.volumeInfo.title,

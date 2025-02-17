@@ -5,6 +5,7 @@ import Explore from './components/Explore'
 import Search from './components/Search'
 import Login from './components/Login'
 import Library from './components/Library'
+import BookPage from './components/BookPage'
 
 export default function App() {
   return (
@@ -15,6 +16,7 @@ export default function App() {
         <Route path='/search' element={<Search />} />
         <Route path='/login' element={<Login />} />
         <Route path='/library' element={<Library />} />
+        <Route path="/:title" element={<BookPage />} />
       </Routes>
     </Router>
   )
