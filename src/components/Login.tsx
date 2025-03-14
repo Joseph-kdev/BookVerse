@@ -1,7 +1,11 @@
 import React, { useReducer } from "react";
 import { userReducer } from "../config/reducers";
 import { useNavigate } from "react-router-dom";
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signInWithPopup,
+} from "firebase/auth";
 import { auth, googleProvider } from "../config/firebase-config";
 
 export default function Login() {
@@ -13,58 +17,79 @@ export default function Login() {
 
   const navigate = useNavigate();
 
-  const signInWithGoogle = async() => {
+  const signInWithGoogle = async () => {
     try {
-        await signInWithPopup(auth, googleProvider)
-        navigate("/");
+      await signInWithPopup(auth, googleProvider);
+      navigate("/");
     } catch (error) {
-        console.error("Problem logging in" + error);
+      console.error("Problem logging in" + error);
     }
-  }
+  };
 
-  const handleLogin = async (event: { preventDefault: () => void; }) => {
+  const handleLogin = async (event: { preventDefault: () => void }) => {
     event.preventDefault();
 
     const email = user.email;
     const password = user.password;
 
-    if(!email || !password) {
-        alert("Please fill in both fields")
+    if (!email || !password) {
+      alert("Please fill in both fields");
     }
-    
+
     try {
-        if(!user.hasAccount){
-            await createUserWithEmailAndPassword(auth, email, password);
-            navigate("/")
-            console.log("User created");
-        } else {
-            await signInWithEmailAndPassword(auth, email, password)
-            navigate("/")
-            console.log("user signed in");
-        }
+      if (!user.hasAccount) {
+        await createUserWithEmailAndPassword(auth, email, password);
+        navigate("/");
+        console.log("User created");
+      } else {
+        await signInWithEmailAndPassword(auth, email, password);
+        navigate("/");
+        console.log("user signed in");
+      }
     } catch (error) {
-        console.error(error)
+      console.error(error);
     }
-  }
+  };
+
+  const toggleDarkMode = () => {
+    document.documentElement.classList.toggle("dark");
+  };
 
   return (
-    <div>
-      <div className="w-full bg-secondary lg:w-1/2 flex items-center justify-center">
-        <div className="max-w-md w-full p-6 bg-primary">
+    <div className="flex h-screen bg-[url('/homebg1.jpg')] bg-cover bg-center bg-no-repeat">
+      <div className="w-full bg-[rgba(0,0,0,0.63)] dark:bg-[rgba(255,255,255,0.11)] flex items-center justify-center h-[100vh] rounded-md">
+        <div className="max-w-md w-full p-6 bg-light-primary dark:bg-dark-primary rounded-lg">
+        <div className="absolute right-3 top-[20px] bg-light-background dark:bg-dark-background rounded-full cursor-pointer p-1">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          strokeWidth={1.5}
+          stroke={"currentColor"}
+          className="size-6 text-light-text dark:text-dark-text"
+          onClick={toggleDarkMode}
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M12 3v2.25m6.364.386-1.591 1.591M21 12h-2.25m-.386 6.364-1.591-1.591M12 18.75V21m-4.773-4.227-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z"
+          />
+        </svg>
+      </div>
           <div className="flex justify-center mb-6">
             <img src="know.png" alt="logo" className="h-[80px] mx-1" />
           </div>
           {user.hasAccount ? (
-            <h1 className="text-3xl font-semibold mb-6 text-black text-center">
+            <h1 className="text-3xl font-semibold mb-6 text-light-background dark:text-dark-background text-center">
               Login
             </h1>
           ) : (
-            <h1 className="text-3xl font-semibold mb-6 text-secondary text-center">
+            <h1 className="text-3xl font-semibold mb-6 text-light-background dark:text-dark-background text-center">
               Sign Up
             </h1>
           )}
-          <h1 className="text-sm font-semibold mb-6 text-text text-center">
-            Lorem ipsoum
+          <h1 className="text-sm font-semibold mb-6 text-light-background dark:text-dark-background text-center">
+            Organize, Track and Relish - Your Ebook Sanctuary
           </h1>
           <div className="mt-4 flex flex-col lg:flex-row items-center justify-between">
             <div className="w-full mb-2 lg:mb-0">
@@ -100,14 +125,14 @@ export default function Login() {
               </button>
             </div>
           </div>
-          <div className="mt-4 text-sm text-text text-center">
+          <div className="mt-4 text-sm text-light-background dark:text-dark-background text-center">
             <p>or with email</p>
           </div>
           <form action="#" method="POST" className="space-y-4">
             <div>
               <label
                 htmlFor="email"
-                className="block text-sm font-medium text-text"
+                className="block text-sm font-medium text-text text-light-background dark:text-dark-background"
               >
                 Email
               </label>
@@ -125,7 +150,7 @@ export default function Login() {
             <div>
               <label
                 htmlFor="password"
-                className="block text-sm font-medium text-text"
+                className="block text-sm font-medium text-light-background dark:text-dark-background"
               >
                 Password
               </label>
@@ -147,20 +172,20 @@ export default function Login() {
               <button
                 type="submit"
                 onClick={handleLogin}
-                className="w-full bg-accent text-gray p-2 rounded-md hover:bg-gray-800 focus:outline-none focus:bg-black focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 transition-colors duration-300"
+                className="w-full bg-light-accent dark:bg-dark-accent text-gray p-2 rounded-md hover:bg-light-secondary dark:hover:bg-dark-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors duration-300 hover:text-light-background"
               >
                 {user.hasAccount ? "Login" : "Sign Up"}
               </button>
             </div>
           </form>
-          <div className="mt-4 text-sm text-gray-600 text-center">
-            <h3>
+          <div className="mt-4 text-sm text-center">
+            <h3 className="text-light-background dark:text-dark-background">
               {user.hasAccount
                 ? "Don't have an account? "
                 : "Already have an account? "}
               <button
                 onClick={() => dispatch({ type: "has-account" })}
-                className="text-accent hover:underline"
+                className="text-light-accent dark:text-dark-accent hover:underline"
               >
                 {user.hasAccount ? "Sign Up" : "Login"}
               </button>

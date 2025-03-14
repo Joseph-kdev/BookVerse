@@ -11,7 +11,7 @@ export default function Home() {
     })
 
   return (
-    <div className='bg-[url("/homebg1.jpg")] bg-center bg-cover bg-fixed'>
+    <div className='bg-[url("/homebg.jpg")] bg-center bg-cover bg-fixed'>
         <Nav/>
         <section className='h-[50vh] flex justify-center items-center mx-1 p-1'>
             <div className='flex justify-center items-center'>
@@ -21,7 +21,8 @@ export default function Home() {
                             Curate your <span className=''>E-BookShelf</span>
                         </h1>
                         <p className='mb-3 text-center text-light-text dark:text-dark-text'>
-                            Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
+                        Welcome to your digital haven for books! Manage 
+                        your collection, track your favorites, and find new reads with ease.
                         </p>
                     </div>
                     <button className='bg-light-accent dark:bg-dark-accent text-light-text dark:text-dark-text px-4 py-2 rounded-full mt-2'>

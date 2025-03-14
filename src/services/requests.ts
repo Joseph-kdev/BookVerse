@@ -61,6 +61,7 @@ export const getGenreBooks = async(genre: string): Promise<GoogleBook[]> => {
         imageLinks: item.volumeInfo.imageLinks,
         publisher: item.volumeInfo.publisher,
         categories: item.volumeInfo.categories,
+        isbnValue: item.volumeInfo.industryIdentifiers
     }))
 
     return foundBooks;

@@ -10,6 +10,11 @@ export interface imageLinks {
     smallThumbnail: string;
     thumbnail: string;
 }
+
+interface IndustryIdentifier {
+    type: string;
+    identifier: string;
+}
 export interface GoogleBook {
     id: string;
     title: string;
@@ -18,6 +23,7 @@ export interface GoogleBook {
     imageLinks?: imageLinks;
     publisher?: string;
     categories: string[];
+    isbnValue: IndustryIdentifier[];
 }
 
 export interface User {
