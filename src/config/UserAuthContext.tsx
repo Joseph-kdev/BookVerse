@@ -8,7 +8,7 @@ export function useUserAuthContext() {
     return useContext(userAuthContext);
 }
 
-export function UserAuthContextProvider({ children }){
+export function UserAuthContextProvider({ children } : {children: React.ReactNode}){
     const [user, setUser] = useState(null)
 
     useEffect(() => {

@@ -2,6 +2,7 @@ import Nav from './Nav'
 import { useQuery } from '@tanstack/react-query'
 import { getBestSellers } from '../services/requests'
 import { Link } from 'react-router-dom'
+import { useUserAuthContext } from '../config/UserAuthContext'
 
 export default function Home() {
     const { data, isLoading, isError } = useQuery({
@@ -9,6 +10,8 @@ export default function Home() {
         queryFn: getBestSellers,
         initialData: [],
     })
+
+    const {user} = useUserAuthContext()
 
   return (
     <div className='bg-[url("/homebg.jpg")] bg-center bg-cover bg-fixed'>
@@ -26,14 +29,14 @@ export default function Home() {
                         </p>
                     </div>
                     <button className='bg-light-accent dark:bg-dark-accent text-light-text dark:text-dark-text px-4 py-2 rounded-full mt-2'>
-                        <Link to="/login">
+                        <Link to={user ? "/explore" : "/login"}>
                             Get Started
                         </Link>
                     </button>
                 </div>
             </div>
         </section>
-        <section className='bg-light-background dark:bg-dark-background p-2 md:p-[5%]'>            
+        <section className='bg-light-background dark:bg-dark-background p-2 md:p-[5%]'>
         <div className='rounded-md h-[50vh] flex flex-col items-center justify-center mt-6 bg-light-primary dark:bg-dark-primary p-1'>
         <div className=''>
                 <h1 className='text-2xl text-center text-light-background dark:text-dark-background'>
