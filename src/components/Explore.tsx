@@ -1,27 +1,29 @@
-import React, { useEffect, useReducer, useState } from 'react'
-import { getGenreBooks } from '../services/requests';
-import Book from './Book';
-import _ from "lodash"
-import Nav from './Nav';
-import { booksReducer } from '../config/reducers';
+import { useEffect, useReducer, useState } from "react";
+import { getGenreBooks } from "../services/requests";
+import Book from "./Book";
+import _ from "lodash";
+import Nav from "./Nav";
+import { booksReducer } from "../config/reducers";
+import { Genres } from "../types";
+
 
 export default function Explore() {
-  const [activeTab, setActiveTab] = useState("our-picks");
-  const [selectedGenre, setSelectedGenre] = useState("")
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)  
+  const [activeTab, setActiveTab] = useState<string>("our-picks");
+  const [selectedGenre, setSelectedGenre] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const tabs = [
     { id: "our-picks", label: "Our Picks" },
     { id: "popular-genres", label: "Popular Genres" },
-    { id: "other-genres", label: "Other Genres" }
+    { id: "other-genres", label: "Other Genres" },
   ];
 
-  const genres: object = {
+  const genres: Genres = {
     "our-picks": [
       "FICTION",
       "CLASSICS",
       "PHILOSOPHY",
-      "BIOGRAPHY & AUTOBIOGRAPHY"
+      "BIOGRAPHY & AUTOBIOGRAPHY",
     ],
     "popular-genres": [
       "FICTION",
@@ -67,54 +69,54 @@ export default function Explore() {
       "TECHNOLOGY & ENGINEERING",
       "TRAVEL",
     ],
-  }
+  };
 
-  const [books, dispatch] = useReducer(booksReducer, [])
+  const [books, dispatch] = useReducer(booksReducer, []);
 
-  const findGenreBooks = async(genre: string) => {
-    setIsLoading(true)
-    setError(null)
+  const findGenreBooks = async (genre: string) => {
+    setIsLoading(true);
+    setError(null);
     try {
-      setSelectedGenre(genre)
-      const result = await getGenreBooks(genre)
+      setSelectedGenre(genre);
+      const result = await getGenreBooks(genre);
       if (!result) {
-        throw new Error("No books found")
+        throw new Error("No books found");
       }
-      dispatch({ type: "GENRE-CHANGE", payload: result })
-      
+      dispatch({ type: "GENRE-CHANGE", payload: result });
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to fetch books');
-      dispatch({ type: "Error"})
+      setError(err instanceof Error ? err.message : "Failed to fetch books");
+      dispatch({ type: "Error" });
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
-  
+  };
+
   useEffect(() => {
-    const initializeGenre = async() => {
-      await findGenreBooks("classics")
-    }
-    initializeGenre()
-  }, [activeTab])
-  
+    const initializeGenre = async () => {
+      await findGenreBooks("classics");
+    };
+    initializeGenre();
+  }, [activeTab]);
+
   return (
-    <section className='bg-light-background dark:bg-dark-background min-h-screen'>
-    <Nav />
+    <section className="bg-light-background dark:bg-dark-background min-h-screen">
+      <Nav />
       <div className="w-full md:max-w-3xl mx-auto lg:grid lg:grid-cols-3 lg:min-w-full lg:p-4 bg-light-background dark:bg-dark-background">
-        <div className='mt-3 lg:col-span-1 lg:fixed lg:right-8'>
+        <div className="mt-3 lg:col-span-1 lg:fixed lg:right-8">
           {/* Tabs Navigation */}
           <div className="relative">
             <div className="overflow-x-auto scrollbar-hide">
               <div className="inline-flex min-w-full bg-light-secondary dark:bg-dark-secondary rounded-lg p-1 justify-evenly font-Oxanium">
-                {tabs.map(tab => (
+                {tabs.map((tab) => (
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
                     className={`
                       px-2 py-2 text-sm font-medium rounded-md transition-all
-                      ${activeTab === tab.id 
-                        ? 'bg-light-accent dark:bg-dark-accent text-light-primary dark:text-dark-primary shadow-sm' 
-                        : 'text-light-background dark:text-dark-background hover:text-gray-900'
+                      ${
+                        activeTab === tab.id
+                          ? "bg-light-accent dark:bg-dark-accent text-light-primary dark:text-dark-primary shadow-sm"
+                          : "text-light-background dark:text-dark-background hover:text-gray-900"
                       }
                       focus:outline-none focus:ring-2 focus:ring-offset-2 focus:light-accent
                     `}
@@ -137,9 +139,10 @@ export default function Explore() {
                      hover:bg-light-accent dark:hover:bg-dark-accent
                     rounded-lg transition-colors
                     text-light-background dark:text-dark-background
-                    ${selectedGenre === genre 
-                      ? 'bg-[#dfbf90] dark:bg-[#6f4f20] text-gray-900 shadow-sm border border-gray-200' 
-                      : 'bg-light-primary dark:bg-dark-primary text-gray-900'
+                    ${
+                      selectedGenre === genre
+                        ? "bg-[#dfbf90] dark:bg-[#6f4f20] text-gray-900 shadow-sm border border-gray-200"
+                        : "bg-light-primary dark:bg-dark-primary text-gray-900"
                     }
                     focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2
                   `}
@@ -153,12 +156,33 @@ export default function Explore() {
         </div>
 
         {/*Books */}
-        <div className='flex gap-2 w-full flex-wrap mt-2 justify-evenly lg:col-span-2 lg:ml-5 lg:max-w-[93%]'>
-          {books.map(bk => (
-            <Book key={bk.id} id={bk.id} title={bk.title} authors={bk.authors} description={bk.description} publisher={bk.publisher} categories={bk.categories} imageLinks={bk.imageLinks}/>
-                  ))}
+        {error && (
+          <div>
+            Something went wrong
+          </div>
+        )}
+        {isLoading ? (
+          <div>
+            Loading..
+          </div>
+        ) : (
+        <div className="flex gap-2 w-full flex-wrap mt-2 justify-evenly lg:col-span-2 lg:ml-5 lg:max-w-[93%]">
+          {books.map((bk) => (
+            <Book
+              key={bk.id}
+              id={bk.id}
+              title={bk.title}
+              authors={bk.authors}
+              description={bk.description}
+              publisher={bk.publisher}
+              categories={bk.categories}
+              imageLinks={bk.imageLinks}
+              isbnValue={bk.isbnValue}
+            />
+          ))}
         </div>
+        )}
       </div>
     </section>
   );
-};
+}

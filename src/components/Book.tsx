@@ -43,6 +43,7 @@ export default function Book({
   imageLinks,
   publisher,
   categories,
+  isbnValue
 }: GoogleBook) {
   const [modalIsOpen, setIsOpen] = useState(false);
   const [showSelect, setShowSelect] = useState(false);
@@ -95,6 +96,7 @@ export default function Book({
             imageLinks,
             publisher,
             categories,
+            isbnValue
           });
           setBookInCollection((prev) => ({ ...prev, [listType]: true }));
           console.log(`${title} added to ${listType}`);
@@ -139,6 +141,8 @@ export default function Book({
 
     checkBookExistence();
   }, [modalIsOpen, user, id]);
+  
+  
   return (
     <>
       <div className="max-w-[140px] flex flex-col p-2" key={id}>
@@ -240,9 +244,7 @@ export default function Book({
               : "Add to Library"}
           </button>
           <button className="m-1 bg-light-accent dark:bg-dark-accent p-2 rounded-md font-Tilt_Neon text-light-background">
-            <Link to={`/${title}`}>
-              More
-            </Link>
+            <Link to={`/${title}`}>More</Link>
           </button>
         </div>
       </Modal>

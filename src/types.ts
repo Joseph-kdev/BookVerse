@@ -6,12 +6,12 @@ export interface BestSellers {
     primary_isbn10: string;
 }
 
-export interface imageLinks {
+export interface ImageLinks {
     smallThumbnail: string;
     thumbnail: string;
 }
 
-interface IndustryIdentifier {
+export interface IndustryIdentifier {
     type: string;
     identifier: string;
 }
@@ -20,14 +20,22 @@ export interface GoogleBook {
     title: string;
     authors?: string[];
     description: string;
-    imageLinks?: imageLinks;
+    imageLinks?: ImageLinks;
     publisher?: string;
     categories: string[];
-    isbnValue: IndustryIdentifier[];
+    isbnValue: IndustryIdentifier[] | null;
 }
 
 export interface User {
-    email: string;
+    uid?: string;
+    email?: string;
+    displayName?: string;
     password: string;
     hasAccount: boolean;
+}
+
+export interface Genres {
+    "our-picks": string[];
+    "popular-genres": string[];
+    "other-genres": string[]
 }
