@@ -12,22 +12,26 @@ export default function Library() {
   const { user } = useUserAuthContext();
   // get books from firestore
   const fetchList = async (listType: string) => {
-    const collectionRef = collection(db, `users/${user.uid}/${listType}`);
+    const collectionRef = collection(db, `users/${user?.uid}/${listType}`);
     const querySnapshot = await getDocs(collectionRef);
     const retrievedData = querySnapshot.docs.map((doc) => ({
-        ...doc.data()
-      }))
-  
-      return retrievedData
+      ...doc.data(),
+    }));
+
+    return retrievedData;
   };
 
-  const { data: books, isLoading, isError } = useQuery({
+  const {
+    data: books,
+    isLoading,
+    isError,
+  } = useQuery({
     queryKey: ["books", filter],
     queryFn: () => fetchList(filter),
     enabled: !!user,
-    initialData:[]
+    initialData: [],
   });
-  
+
   return (
     <section className="bg-light-background dark:bg-dark-background min-h-screen">
       <Nav />
@@ -35,24 +39,39 @@ export default function Library() {
       {isError && <div>Error occured</div>}
       <div>
         <div className="bg-[url('/homebg1.jpg')] bg-center bg-cover bg-no-repeat min-h-[15vh] flex justify-center items-center relative">
-        <div className="bg-light-secondary dark:bg-dark-secondary bg-opacity-70 dark:bg-opacity-70 absolute top-0 left-0 w-full h-full"></div>
+          <div className="bg-light-secondary dark:bg-dark-secondary bg-opacity-70 dark:bg-opacity-70 absolute top-0 left-0 w-full h-full"></div>
           <h2 className="text-center font-Rubik_Dirt text-3xl mt-5 z-10 text-light-background dark:text-dark-background">
             Your library
           </h2>
         </div>
         <div className="mt-2 mx-2">
-          <select name="books-filter" value={filter} onChange={(event) => setFilter(event?.target.value)} className="h-9 px-2 border border-light-secondary dark:border-dark-secondary rounded-full bg-light-primary dark:bg-dark-primary text-light-background dark:text-dark-background">
+          <select
+            name="books-filter"
+            value={filter}
+            onChange={(event) => setFilter(event?.target.value)}
+            className="h-9 px-2 border border-light-secondary dark:border-dark-secondary rounded-full bg-light-primary dark:bg-dark-primary text-light-background dark:text-dark-background"
+          >
             <option value="favorite">Favorites</option>
             <option value="reading-list">My Reading List</option>
             <option value="already-read">Already Read</option>
           </select>
         </div>
       </div>
-                <div className='flex gap-2 w-full flex-wrap mt-2 justify-evenly lg:col-span-2 lg:ml-5 lg:max-w-[93%]'>
-                  {books.map(bk => (
-                    <Book key={bk.id} id={bk.id} title={bk.title} authors={bk.authors} description={bk.description} publisher={bk.publisher} categories={bk.categories} imageLinks={bk.imageLinks}/>
-                          ))}
-                </div>
+      <div className="flex gap-2 w-full flex-wrap mt-2 justify-evenly lg:col-span-2 lg:ml-5 lg:max-w-[93%]">
+        {books.map((bk) => (
+          <div key={bk.id}>
+            <Book
+              id={bk.id}
+              title={bk.title}
+              authors={bk.authors}
+              description={bk.description}
+              publisher={bk.publisher}
+              categories={bk.categories}
+              imageLinks={bk.imageLinks}
+            />
+          </div>
+        ))}
+      </div>
     </section>
   );
 }

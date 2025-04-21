@@ -168,17 +168,18 @@ export default function Explore() {
         ) : (
         <div className="flex gap-2 w-full flex-wrap mt-2 justify-evenly lg:col-span-2 lg:ml-5 lg:max-w-[93%]">
           {books.map((bk) => (
-            <Book
-              key={bk.id}
-              id={bk.id}
-              title={bk.title}
-              authors={bk.authors}
-              description={bk.description}
-              publisher={bk.publisher}
-              categories={bk.categories}
-              imageLinks={bk.imageLinks}
-              isbnValue={bk.isbnValue}
-            />
+            <div key={bk.id}>
+              <Book
+                id={bk.id}
+                title={bk.title}
+                authors={bk.authors}
+                description={bk.description}
+                publisher={bk.publisher}
+                categories={bk.categories}
+                imageLinks={bk.imageLinks}
+                isbnValue={bk.isbnValue}
+              />
+            </div>
           ))}
         </div>
         )}

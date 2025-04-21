@@ -43,7 +43,7 @@ export default function Book({
   imageLinks,
   publisher,
   categories,
-  isbnValue
+  isbnValue,
 }: GoogleBook) {
   const [modalIsOpen, setIsOpen] = useState(false);
   const [showSelect, setShowSelect] = useState(false);
@@ -96,7 +96,7 @@ export default function Book({
             imageLinks,
             publisher,
             categories,
-            isbnValue
+            isbnValue,
           });
           setBookInCollection((prev) => ({ ...prev, [listType]: true }));
           console.log(`${title} added to ${listType}`);
@@ -141,11 +141,10 @@ export default function Book({
 
     checkBookExistence();
   }, [modalIsOpen, user, id]);
-  
-  
+
   return (
-    <>
-      <div className="max-w-[140px] flex flex-col p-2" key={id}>
+    <div>
+      <div className="max-w-[140px] flex flex-col p-2">
         <div className="w-full">
           <a onClick={openModal} className="cursor-pointer">
             <img
@@ -219,7 +218,7 @@ export default function Book({
               </h3>
               <p className="font-Buda text-sm">
                 {authors?.map((author) => (
-                  <p>{author},</p>
+                  <p key={author}>{author},</p>
                 ))}
               </p>
               <p className="font-sans text-sm">
@@ -231,7 +230,7 @@ export default function Book({
         <div className="w-full grid grid-cols-2">
           <button
             onClick={() => setShowSelect(!showSelect)}
-            className={`m-1 text-light-background font-Tilt_Neon p-2 rounded-md ${
+            className={`m-1 text-dark-background dark:text-light-background font-Tilt_Neon p-2 rounded-md ${
               bookInCollection["already-read"] ||
               bookInCollection["reading-list"]
                 ? "bg-red-500"
@@ -243,9 +242,20 @@ export default function Book({
               ? "Remove from Library"
               : "Add to Library"}
           </button>
-          <button className="m-1 bg-light-accent dark:bg-dark-accent p-2 rounded-md font-Tilt_Neon text-light-background">
-            <Link to={`/${title}`}>More</Link>
-          </button>
+          <Link
+            to={`/book/${title}`}
+            state={{
+              title,
+              authors,
+              description,
+              imageLinks,
+              publisher,
+              categories,
+            }}
+            className="m-1 bg-light-accent dark:bg-dark-accent p-2 rounded-md font-Tilt_Neon flex justify-center text-dark-background dark:text-light-background"
+          >
+            More
+          </Link>
         </div>
       </Modal>
       <Modal
@@ -290,6 +300,6 @@ export default function Book({
           </div>
         </div>
       </Modal>
-    </>
+    </div>
   );
 }
