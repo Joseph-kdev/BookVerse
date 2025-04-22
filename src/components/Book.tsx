@@ -51,7 +51,7 @@ export default function Book({
   const [bookInCollection, setBookInCollection] = useState({
     "reading-list": false,
     "already-read": false,
-    favorite: false,
+    "favorite": false,
   });
   const truncateTitle = (title: string, maxLength: number): string => {
     if (!title) {
@@ -245,12 +245,14 @@ export default function Book({
           <Link
             to={`/book/${title}`}
             state={{
+              id,
               title,
               authors,
               description,
               imageLinks,
               publisher,
               categories,
+              isbnValue
             }}
             className="m-1 bg-light-accent dark:bg-dark-accent p-2 rounded-md font-Tilt_Neon flex justify-center text-dark-background dark:text-light-background"
           >
