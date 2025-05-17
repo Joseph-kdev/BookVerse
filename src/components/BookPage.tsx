@@ -23,6 +23,7 @@ export default function BookPage() {
     favorite: false,
   });
   const { user } = useUserAuthContext();
+
   const toggleBookLibrary = async (listType: string, action: string) => {
     if (!user) {
       console.log("You have to be logged in");
@@ -90,25 +91,33 @@ export default function BookPage() {
   }, [user, bookData.id]);
 
   return (
-    <div className="bg-light-background dark:bg-dark-background h-screen">
+    <div className="bg-light-background dark:bg-dark-background h-full">
       <Nav />
-      <div className="text-center text-2xl mt-2">{title}</div>
-      <div className="flex flex-col-reverse items-center mt-3 px-[5%] md:flex-row md:justify-between md:items-start">
-        <div className="md:w-[70vw] bg-light-primary bg-opacity-70 dark:bg-dark-primary p-2 rounded-md">
-          <p className="text-lg">Description:</p>
-          {bookData.description}
-          <hr className="my-2" />
-          <p>
+      <div className="md:hidden">
+        <h2 className="text-center font-Rubik_Dirt text-3xl mt-5 z-10">
+          {title}
+        </h2>
+      </div>
+      <div className="flex flex-col-reverse items-center mt-4 px-1 md:px-[10%] md:flex-row md:justify-between md:items-start md:gap-3 md:mt-5">
+        <div className="md:w-[70vw] p-2 rounded-md dark:text-dark-text text-light-text">
+          <div className="hidden md:block">
+            <h2 className="font-Rubik_Dirt text-3xl z-10">{title}</h2>
+          </div>
+          <p className="text-lg font-Tilt_Neon md:my-2">Description:</p>
+          <p className="text-sm leading-relaxed">{bookData.description}</p>
+          <p className="font-Oxanium text-sm mt-4">
             Author(s):{" "}
             {bookData.authors?.map((a) => (
               <span>{a}</span>
             ))}
           </p>
-          <p>Publisher: {bookData?.publisher}</p>
-          <p>
+          <p className="font-Oxanium text-sm">
+            Publisher: {bookData?.publisher}
+          </p>
+          <p className="font-Oxanium text-sm">
             Genre(s):{" "}
             {bookData.categories?.map((g) => (
-              <span>{g}</span>
+              <span key={g}>{g}</span>
             ))}
           </p>
         </div>
@@ -116,103 +125,105 @@ export default function BookPage() {
           <img
             src={bookData.imageLinks?.thumbnail}
             alt={bookData.title}
-            className=""
+            className="md:w-[350px]"
           />
-          <div>
-            <button
-              onClick={() =>
-                toggleBookLibrary(
-                  "reading-list",
-                  bookInCollection["reading-list"] ? "remove" : "add"
-                )
-              }
-              className={`w-full flex gap-1 text-dark-background dark:text-light-background font-Tilt_Neon p-2 rounded-md ${
-                bookInCollection["reading-list"]
-                  ? "bg-red-500"
-                  : "bg-light-accent dark:bg-dark-accent"
-              }`}
-            >
-              {bookInCollection["reading-list"] ? (
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={1.5}
-                  stroke="currentColor"
-                  className="size-6"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"
-                  />
-                </svg>
-              ) : (
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={1.5}
-                  stroke="currentColor"
-                  className="size-6"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M12 4.5v15m7.5-7.5h-15"
-                  />
-                </svg>
-              )}
-              <p>Reading List</p>
-            </button>
-            <button
-              className={`w-full flex p-2 rounded-md mt-3 text-dark-background dark:text-light-background ${
-                bookInCollection["already-read"]
-                  ? "bg-red-600"
-                  : "bg-light-accent dark:bg-dark-accent"
-              }`}
-              onClick={() =>
-                toggleBookLibrary(
-                  "already-read",
-                  bookInCollection["already-read"] ? "remove" : "add"
-                )
-              }
-            >
-              {bookInCollection["already-read"] ? (
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={1.5}
-                  stroke="currentColor"
-                  className="size-6"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"
-                  />
-                </svg>
-              ) : (
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={1.5}
-                  stroke="currentColor"
-                  className="size-6"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M12 4.5v15m7.5-7.5h-15"
-                  />
-                </svg>
-              )}
-              <p>Already Read</p>
-            </button>
+          <div className="">
+            <div className="md:grid md:grid-cols-2 md:gap-2">
+              <button
+                onClick={() =>
+                  toggleBookLibrary(
+                    "reading-list",
+                    bookInCollection["reading-list"] ? "remove" : "add"
+                  )
+                }
+                className={`w-full flex gap-1 text-dark-background font-Tilt_Neon p-2 rounded-md md:mt-3 ${
+                  bookInCollection["reading-list"]
+                    ? "bg-red-500 text-light-background"
+                    : "bg-light-accent dark:bg-dark-accent"
+                }`}
+              >
+                {bookInCollection["reading-list"] ? (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke-width="1.5"
+                    stroke="currentColor"
+                    className="size-6"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M5 12h14"
+                    />
+                  </svg>
+                ) : (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={1.5}
+                    stroke="currentColor"
+                    className="size-6"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M12 4.5v15m7.5-7.5h-15"
+                    />
+                  </svg>
+                )}
+                <p>Reading List</p>
+              </button>
+              <button
+                className={`w-full flex p-2 rounded-md mt-3 text-dark-background h-10 ${
+                  bookInCollection["already-read"]
+                    ? "bg-light-text text-light-background"
+                    : "bg-light-accent"
+                }`}
+                onClick={() =>
+                  toggleBookLibrary(
+                    "already-read",
+                    bookInCollection["already-read"] ? "remove" : "add"
+                  )
+                }
+              >
+                {bookInCollection["already-read"] ? (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={1.5}
+                    stroke="currentColor"
+                    className="size-6"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M6 18 18 6M6 6l12 12"
+                    />
+                  </svg>
+                ) : (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={1.5}
+                    stroke="currentColor"
+                    className="size-6"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="m4.5 12.75 6 6 9-13.5"
+                    />
+                  </svg>
+                )}
+                <p className="w-full">Already Read</p>
+              </button>
+            </div>
             <div
-              className="mt-3 cursor-pointer"
+              className="mt-3 cursor-pointer dark:text-dark-text"
               onClick={() =>
                 toggleBookLibrary(
                   "favorite",
@@ -221,35 +232,41 @@ export default function BookPage() {
               }
             >
               {bookInCollection["favorite"] ? (
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="red"
-                  viewBox="0 0 24 24"
-                  strokeWidth={1.5}
-                  stroke="currentColor"
-                  className="size-6"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"
-                  />
-                </svg>
+                <button className="flex border-2 border-amber-500 p-1 w-full rounded-md justify-evenly md:p-2">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="#ffc107"
+                    viewBox="0 0 24 24"
+                    strokeWidth={1.5}
+                    stroke="white"
+                    className="size-6"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"
+                    />
+                  </svg>
+                  <p>Remove Favorites</p>
+                </button>
               ) : (
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="white"
-                  viewBox="0 0 24 24"
-                  strokeWidth={1.5}
-                  stroke="currentColor"
-                  className="size-6"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"
-                  />
-                </svg>
+                <button className="flex border-2 border-amber-500 p-1 w-full rounded-md justify-evenly md:p-2">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="white"
+                    viewBox="0 0 24 24"
+                    strokeWidth={1.5}
+                    stroke="currentColor"
+                    className="size-6"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"
+                    />
+                  </svg>
+                  <p>Add Favorites</p>
+                </button>
               )}
             </div>
           </div>

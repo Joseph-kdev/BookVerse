@@ -72,6 +72,12 @@ export const searchBooks = async (query: string): Promise<GoogleBook[]> => {
 
 export const getGenreBooks = async (genre: string): Promise<GoogleBook[]> => {
   try {
+    const books = sessionStorage.getItem(`${genre}`)
+
+    if(books) {
+      return JSON.parse(books);
+    }
+
     const response = await axios.get(
       `${googleBooksUrl}/?q=subject:${genre}&api-key=${google_key}&orderBy=relevance&maxResults=40`
     );
@@ -99,9 +105,7 @@ export const getGenreBooks = async (genre: string): Promise<GoogleBook[]> => {
         isbnValue: item.volumeInfo.industryIdentifiers,
       })
     );
-
-    console.log(foundBooks);
-
+    sessionStorage.setItem(`${genre}`, JSON.stringify(foundBooks))
     return foundBooks;
   } catch (error) {
     console.error("Error fetching genre", error);

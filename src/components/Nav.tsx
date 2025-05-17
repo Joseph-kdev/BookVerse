@@ -2,22 +2,26 @@ import { Link } from "react-router-dom";
 import { useUserAuthContext } from "../config/UserAuthContext";
 import { signOut } from "firebase/auth";
 import { auth } from "../config/firebase-config";
+import { BookOpen } from "lucide-react";
 
 export default function Nav() {
   const toggleDarkMode = () => {
     document.documentElement.classList.toggle("dark");
   };
 
-  const {user} = useUserAuthContext();
+  const { user } = useUserAuthContext();
 
-  const handleLogOut = async() => {
-    await signOut(auth)
-  }
+  const handleLogOut = async () => {
+    await signOut(auth);
+  };
 
   return (
-    <nav className="flex justify-between p-1 md:px-4 bg-light-background dark:bg-dark-background sticky top-0 items-center text-light-background dark:text-dark-background">
-      <div className="ml-1 text-light-text dark:text-dark-text">
-        <Link to="/">Logo</Link>
+    <nav className="flex justify-between p-1 md:px-4 bg-light-background dark:bg-dark-background sticky top-0 items-center text-light-background dark:text-dark-background z-50">
+      <div className="flex items-center">
+        <BookOpen className="h-8 w-8 text-amber-500" />
+        <span className="ml-2 text-xl font-bold text-light-text dark:text-dark-text hidden md:block">
+          BookVerse
+        </span>
       </div>
       <div className="bg-light-primary dark:bg-dark-primary p-2 rounded-full w-[200px] md:min-w-[300px] flex justify-evenly">
         <div>
