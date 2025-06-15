@@ -18,7 +18,7 @@ export interface IndustryIdentifier {
 export interface GoogleBook {
     id: string;
     title: string;
-    authors?: string[];
+    authors: string[];
     description: string;
     imageLinks?: ImageLinks;
     publisher?: string;
@@ -38,4 +38,14 @@ export interface Genres {
     "our-picks": string[];
     "popular-genres": string[];
     "other-genres": string[]
+}
+
+export interface BookLinks {
+    title: string;
+    publisher: string;
+    year: string;
+    format: string;
+    link: string;
+    size: string;
+    pages: string;
 }

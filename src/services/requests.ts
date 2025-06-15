@@ -1,6 +1,7 @@
 import axios from "axios";
 import {
   BestSellers,
+  BookLinks,
   GoogleBook,
   ImageLinks,
   IndustryIdentifier,
@@ -8,6 +9,7 @@ import {
 
 const bestSellersUrl: string = "https://api.nytimes.com/svc/books/v3/lists/";
 const googleBooksUrl: string = "https://www.googleapis.com/books/v1/volumes";
+const serverUrl: string = import.meta.env.VITE_SERVER_URL;
 
 const nyt_key = import.meta.env.VITE_NYT_API_KEY;
 const google_key = import.meta.env.VITE_BOOKS_API_KEY;
@@ -72,9 +74,9 @@ export const searchBooks = async (query: string): Promise<GoogleBook[]> => {
 
 export const getGenreBooks = async (genre: string): Promise<GoogleBook[]> => {
   try {
-    const books = sessionStorage.getItem(`${genre}`)
+    const books = sessionStorage.getItem(`${genre}`);
 
-    if(books) {
+    if (books) {
       return JSON.parse(books);
     }
 
@@ -105,10 +107,49 @@ export const getGenreBooks = async (genre: string): Promise<GoogleBook[]> => {
         isbnValue: item.volumeInfo.industryIdentifiers,
       })
     );
-    sessionStorage.setItem(`${genre}`, JSON.stringify(foundBooks))
+    sessionStorage.setItem(`${genre}`, JSON.stringify(foundBooks));
     return foundBooks;
   } catch (error) {
     console.error("Error fetching genre", error);
     throw new Error("Failed to fetch genre");
+  }
+};
+
+export const getDownloadLinks = async (
+  title: string,
+): Promise<BookLinks[]> => {
+  try {
+    const downloadLinks = sessionStorage.getItem(`${title}`);
+
+    if (downloadLinks) {
+      return JSON.parse(downloadLinks);
+    }
+
+    const response = await axios.get(`${serverUrl}/${title}`);
+    console.log(response);
+    const foundLinks: BookLinks[] = response.data.result.map(
+      (link: {
+        title: string;
+        publisher: string;
+        year: string;
+        format: string;
+        link: string;
+        size: string;
+        pages: string;
+      }) => ({
+        title: link.title,
+        publisher: link.publisher,
+        year: link.year,
+        format: link.format,
+        link: link.link,
+        size: link.size,
+        pages: link.pages,
+      })
+    );
+    sessionStorage.setItem(`${title}`, JSON.stringify(foundLinks))
+    return foundLinks
+  } catch (error) {
+    console.error("Error fetching links", error);
+    throw new Error("Failed to fetch links");
   }
 };

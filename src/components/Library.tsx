@@ -67,8 +67,8 @@ export default function Library() {
               description={bk.description}
               publisher={bk.publisher}
               categories={bk.categories}
-              imageLinks={bk.imageLinks}
-            />
+              imageLinks={bk.imageLinks} 
+              isbnValue={null}            />
           </div>
         ))}
       </div>

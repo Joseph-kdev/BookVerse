@@ -1,30 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { GoogleBook } from "../types";
 import Modal from "react-modal";
-import { useUserAuthContext } from "../config/UserAuthContext";
-import { db } from "../config/firebase-config";
-import {
-  addDoc,
-  collection,
-  deleteDoc,
-  getDocs,
-  query,
-  where,
-} from "firebase/firestore";
 import { Link } from "react-router-dom";
 
 const customStyles = {
-  content: {
-    top: "50%",
-    left: "50%",
-    right: "auto",
-    bottom: "auto",
-    marginRight: "-50%",
-    transform: "translate(-50%, -50%)",
-  },
-};
-
-const customLibraryStyles = {
   content: {
     top: "50%",
     left: "50%",
@@ -46,13 +25,7 @@ export default function Book({
   isbnValue,
 }: GoogleBook) {
   const [modalIsOpen, setIsOpen] = useState(false);
-  const [showSelect, setShowSelect] = useState(false);
-  const { user } = useUserAuthContext();
-  const [bookInCollection, setBookInCollection] = useState({
-    "reading-list": false,
-    "already-read": false,
-    "favorite": false,
-  });
+
   const truncateTitle = (title: string, maxLength: number): string => {
     if (!title) {
       return "";
@@ -66,81 +39,9 @@ export default function Book({
   const closeModal = () => {
     setIsOpen(false);
   };
-  const closeLibraryModal = () => {
-    setShowSelect(false);
-  };
   const openModal = () => {
     setIsOpen(true);
   };
-
-  // library functionality for logged in users
-  const toggleBookLibrary = async (listType: string, action: string) => {
-    if (!user) {
-      console.log("YOu need to be logged in");
-      return;
-    }
-
-    const collectionRef = collection(db, `users/${user.uid}/${listType}`);
-
-    try {
-      const bookQuery = query(collectionRef, where("id", "==", id));
-      const querySnapshot = await getDocs(bookQuery);
-
-      if (querySnapshot.empty) {
-        if (action === "add") {
-          await addDoc(collectionRef, {
-            id,
-            title,
-            authors,
-            description,
-            imageLinks,
-            publisher,
-            categories,
-            isbnValue,
-          });
-          setBookInCollection((prev) => ({ ...prev, [listType]: true }));
-          console.log(`${title} added to ${listType}`);
-        } else {
-          console.log("Cannot remove non-existent book");
-        }
-      } else {
-        const docRef = querySnapshot.docs[0].ref;
-        if (action === "add") {
-          console.log("already saved");
-        } else if (action === "remove") {
-          await deleteDoc(docRef);
-          setBookInCollection((prev) => ({ ...prev, [listType]: false }));
-          console.log(`${title} removed from ${listType}`);
-        }
-      }
-    } catch (error) {
-      console.log("Error adding books", error);
-    }
-  };
-
-  //check for the book in the db if logged in
-  useEffect(() => {
-    const checkBookExistence = async () => {
-      if (!user) return;
-
-      const checkList = async (listType: string) => {
-        const collectionRef = collection(db, `users/${user.uid}/${listType}`);
-        const bookQuery = query(collectionRef, where("id", "==", id));
-        const querySnapshot = await getDocs(bookQuery);
-
-        setBookInCollection((prev) => ({
-          ...prev,
-          [listType]: !querySnapshot.empty,
-        }));
-      };
-
-      await checkList("reading-list");
-      await checkList("already-read");
-      await checkList("favorite");
-    };
-
-    checkBookExistence();
-  }, [modalIsOpen, user, id]);
 
   return (
     <div>
@@ -169,47 +70,6 @@ export default function Book({
         <div className="flex gap-2 items-start max-w-[500px]">
           <div className="min-w-[100px]">
             <img src={imageLinks?.thumbnail} alt={title} />
-            <div
-              className="mt-3 cursor-pointer"
-              onClick={() =>
-                toggleBookLibrary(
-                  "favorite",
-                  bookInCollection["favorite"] ? "remove" : "add"
-                )
-              }
-            >
-              {bookInCollection["favorite"] ? (
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="red"
-                  viewBox="0 0 24 24"
-                  strokeWidth={1.5}
-                  stroke="currentColor"
-                  className="size-6"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"
-                  />
-                </svg>
-              ) : (
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={1.5}
-                  stroke="currentColor"
-                  className="size-6"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"
-                  />
-                </svg>
-              )}
-            </div>
           </div>
           <div>
             <div>
@@ -227,21 +87,7 @@ export default function Book({
             </div>
           </div>
         </div>
-        <div className="w-full grid grid-cols-2">
-          <button
-            onClick={() => setShowSelect(!showSelect)}
-            className={`m-1 text-dark-background dark:text-light-background font-Tilt_Neon p-2 rounded-md ${
-              bookInCollection["already-read"] ||
-              bookInCollection["reading-list"]
-                ? "bg-red-500"
-                : "bg-light-accent dark:bg-dark-accent"
-            }`}
-          >
-            {bookInCollection["already-read"] ||
-            bookInCollection["reading-list"]
-              ? "Remove from Library"
-              : "Add to Library"}
-          </button>
+        <div className="w-full mt-4">
           <Link
             to={`/book/${title}`}
             state={{
@@ -258,48 +104,6 @@ export default function Book({
           >
             More
           </Link>
-        </div>
-      </Modal>
-      <Modal
-        isOpen={showSelect}
-        onRequestClose={closeLibraryModal}
-        contentLabel="Library Modal"
-        style={customLibraryStyles}
-      >
-        <div className="min-w-[320px]">
-          <h3 className="font-Oxanium text-lg">Assign a tag:</h3>
-          <div className="w-full grid grid-cols-2">
-            <button
-              className={`bg-pink-400 m-1 p-2 rounded-md ${
-                bookInCollection["reading-list"]
-                  ? "bg-red-600"
-                  : "bg-light-secondary dark:bg-dark-secondary"
-              }`}
-              onClick={() =>
-                toggleBookLibrary(
-                  "reading-list",
-                  bookInCollection["reading-list"] ? "remove" : "add"
-                )
-              }
-            >
-              {bookInCollection["reading-list"] ? "Remove" : "Reading list"}
-            </button>
-            <button
-              className={`bg-pink-400 m-1 p-2 rounded-md ${
-                bookInCollection["already-read"]
-                  ? "bg-red-600"
-                  : "bg-light-secondary dark:bg-dark-secondary"
-              }`}
-              onClick={() =>
-                toggleBookLibrary(
-                  "already-read",
-                  bookInCollection["already-read"] ? "remove" : "add"
-                )
-              }
-            >
-              {bookInCollection["already-read"] ? "Remove" : "Already Read"}
-            </button>
-          </div>
         </div>
       </Modal>
     </div>

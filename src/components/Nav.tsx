@@ -69,7 +69,7 @@ export default function Nav() {
               >
                 <path d="M22 24h-17c-1.657 0-3-1.343-3-3v-18c0-1.657 1.343-3 3-3h17v24zm-2-4h-14.505c-1.375 0-1.375 2 0 2h14.505v-2zm0-18h-3v9l-2-1.547-2 1.547v-9h-8v16h15v-16z" />
               </svg>
-              <p className="hidden md:block">My Library</p>
+              <p className="hidden md:block">Library</p>
             </Link>
           </div>
         )}
@@ -92,8 +92,7 @@ export default function Nav() {
           </svg>
         </Link>
       </div>
-      <div className="absolute right-3 top-[60px] bg-light-background dark:bg-dark-background rounded-full cursor-pointer p-1">
-        {user && (
+                {/* {user && (
           <div className=" bg-light-background dark:bg-dark-primary rounded-full cursor-pointer p-1">
             <svg
               width="24px"
@@ -126,7 +125,8 @@ export default function Nav() {
               ></path>
             </svg>
           </div>
-        )}
+        )} */}
+      <div className="absolute right-2 top-[92vh] bg-light-background dark:bg-dark-background rounded-full cursor-pointer p-1">
         <div className=" bg-light-background dark:bg-dark-background rounded-full cursor-pointer p-1">
           <svg
             xmlns="http://www.w3.org/2000/svg"

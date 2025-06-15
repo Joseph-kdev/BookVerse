@@ -12,6 +12,9 @@ import {
   where,
 } from "firebase/firestore";
 import { db } from "../config/firebase-config";
+import { useQuery } from "@tanstack/react-query";
+import { getDownloadLinks } from "../services/requests";
+import { Download } from "lucide-react";
 
 export default function BookPage() {
   const { title } = useParams();
@@ -90,6 +93,18 @@ export default function BookPage() {
     checkBookExistence();
   }, [user, bookData.id]);
 
+  const {
+    data: links,
+    isLoading,
+    isError,
+  } = useQuery({
+    queryKey: [`${title}`],
+    queryFn: () => getDownloadLinks(bookData.title),
+    initialData: [],
+  });
+
+  console.log("fetched links", links);
+
   return (
     <div className="bg-light-background dark:bg-dark-background h-full">
       <Nav />
@@ -120,6 +135,62 @@ export default function BookPage() {
               <span key={g}>{g}</span>
             ))}
           </p>
+          <div>
+            <p className="my-2 font-Tilt_Neon text-lg">Download links</p>
+            {isLoading ? (
+              <p>loading..</p>
+            ) : isError ? (
+              <p>Error loading links</p>
+            ) : (
+              <div className="">
+                <div className="shadow-lg rounded-lg">
+                  <table className="w-full bg-light-background border-collapse">
+                    <thead>
+                      <tr className="bg-light-background border-b border-gray-200">
+                        <th className="px-2 py-2 text-left text-sm text-gray-900 tracking-wider">
+                          Links
+                        </th>
+                        <th className="px-6 py-2 text-left text-sm text-gray-900  tracking-wider">
+                          Format
+                        </th>
+                        <th className="px-2 py-2 text-left text-sm text-gray-900  tracking-wider">
+                          Size
+                        </th>
+                        <th className="px-2 py-2 text-center text-sm text-gray-900  tracking-wider">
+                          Download
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-200">
+                      {links.map((link, index) => (
+                        <tr
+                          key={index}
+                          className="hover:bg-gray-50 transition-colors duration-150"
+                        >
+                          <td className="px-2 py-4 text-sm text-gray-900">
+                            Link {index + 1}
+                          </td>
+                          <td className="px-6 py-4 text-sm text-gray-700">
+                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-light-secondary text-dark-text">
+                              {link.format}
+                            </span>
+                          </td>
+                          <td className="px-4 py-4 text-sm text-light-text">
+                            {link.size}
+                          </td>
+                          <td className="px-4 py-4 text-center">
+                            <a href={link.link} className="inline-flex items-center justify-center p-2 rounded-full bg-light-primary" target="_blank">
+                              <Download size={20} color="#ffc107" />
+                            </a>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
         <div className="mb-2 grid grid-cols-2 gap-2 md:flex md:flex-col">
           <img
@@ -136,7 +207,7 @@ export default function BookPage() {
                     bookInCollection["reading-list"] ? "remove" : "add"
                   )
                 }
-                className={`w-full flex gap-1 text-dark-background font-Tilt_Neon p-2 rounded-md md:mt-3 ${
+                className={`w-full flex items-center gap-1 text-dark-background font-Tilt_Neon p-2 rounded-md md:mt-3 ${
                   bookInCollection["reading-list"]
                     ? "bg-red-500 text-light-background"
                     : "bg-light-accent dark:bg-dark-accent"
@@ -149,7 +220,7 @@ export default function BookPage() {
                     viewBox="0 0 24 24"
                     stroke-width="1.5"
                     stroke="currentColor"
-                    className="size-6"
+                    className="size-4"
                   >
                     <path
                       stroke-linecap="round"
@@ -164,7 +235,7 @@ export default function BookPage() {
                     viewBox="0 0 24 24"
                     strokeWidth={1.5}
                     stroke="currentColor"
-                    className="size-6"
+                    className="size-4"
                   >
                     <path
                       strokeLinecap="round"
@@ -176,7 +247,7 @@ export default function BookPage() {
                 <p>Reading List</p>
               </button>
               <button
-                className={`w-full flex p-2 rounded-md mt-3 text-dark-background h-10 ${
+                className={`w-full flex items-center p-2 rounded-md mt-3 text-dark-background h-10 ${
                   bookInCollection["already-read"]
                     ? "bg-light-text text-light-background"
                     : "bg-light-accent"
@@ -195,7 +266,7 @@ export default function BookPage() {
                     viewBox="0 0 24 24"
                     strokeWidth={1.5}
                     stroke="currentColor"
-                    className="size-6"
+                    className="size-4"
                   >
                     <path
                       strokeLinecap="round"
@@ -210,12 +281,12 @@ export default function BookPage() {
                     viewBox="0 0 24 24"
                     strokeWidth={1.5}
                     stroke="currentColor"
-                    className="size-6"
+                    className="size-4"
                   >
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
-                      d="m4.5 12.75 6 6 9-13.5"
+                      d="m4.5 12.75 4 4 9-13.5"
                     />
                   </svg>
                 )}
@@ -232,14 +303,14 @@ export default function BookPage() {
               }
             >
               {bookInCollection["favorite"] ? (
-                <button className="flex border-2 border-amber-500 p-1 w-full rounded-md justify-evenly md:p-2">
+                <button className="flex items-center border-2 border-amber-500 p-1 w-full rounded-md justify-evenly md:p-2">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill="#ffc107"
                     viewBox="0 0 24 24"
                     strokeWidth={1.5}
                     stroke="white"
-                    className="size-6"
+                    className="size-4"
                   >
                     <path
                       strokeLinecap="round"
@@ -250,14 +321,14 @@ export default function BookPage() {
                   <p>Remove Favorites</p>
                 </button>
               ) : (
-                <button className="flex border-2 border-amber-500 p-1 w-full rounded-md justify-evenly md:p-2">
+                <button className="flex items-center border-2 border-amber-500 p-1 w-full rounded-md justify-evenly md:p-2">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill="white"
                     viewBox="0 0 24 24"
                     strokeWidth={1.5}
                     stroke="currentColor"
-                    className="size-6"
+                    className="size-4"
                   >
                     <path
                       strokeLinecap="round"

@@ -107,7 +107,7 @@ export default function Home() {
         <div className="absolute inset-0 bg-[rgb(0,0,0,0.6)]"></div>
 
         {/* Content */}
-        <div className="container mx-auto px-4 md:px-6 lg:px-8 z-10">
+        <div className="container mx-auto px-4 md:px-6 lg:px-8 z-10 mb-28">
           <div className="flex flex-col lg:flex-row items-center">
             <div className="lg:w-1/2 mb-12 lg:mb-0">
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight mb-6 animate-fadeIn">
@@ -124,7 +124,7 @@ export default function Home() {
                   <Link to={user ? "/explore" : "/login"}>Get Started</Link>
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
+                    fill="#ffc107"
                     viewBox="0 0 24 24"
                     strokeWidth={1.5}
                     stroke="currentColor"
@@ -142,17 +142,6 @@ export default function Home() {
                 </button> */}
               </div>
             </div>
-
-            <div className="lg:w-1/2 animate-float">
-              <div className="relative">
-                <div className="absolute -top-4 -left-4 w-full h-full bg-amber-500 rounded-xl transform rotate-3"></div>
-                <img
-                  src="https://images.pexels.com/photos/1907785/pexels-photo-1907785.jpeg"
-                  alt="BookVerse App Preview"
-                  className="relative z-10 rounded-xl shadow-xl max-w-md mx-auto object-cover"
-                />
-              </div>
-            </div>
           </div>
         </div>
 
@@ -164,7 +153,7 @@ export default function Home() {
             className="w-full"
           >
             <path
-              fill="#ffffff"
+              fill="#F9F6F0"
               fillOpacity="1"
               d="M0,192L48,197.3C96,203,192,213,288,229.3C384,245,480,267,576,250.7C672,235,768,181,864,170.7C960,160,1056,192,1152,197.3C1248,203,1344,181,1392,170.7L1440,160L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"
             ></path>
@@ -173,7 +162,7 @@ export default function Home() {
       </section>
       <section
         id="features"
-        className="py-20 bg-gray-50 dark:bg-dark-background"
+        className="py-20 bg-light-background dark:bg-dark-background"
       >
         <div className="container mx-auto px-4 md:px-6 lg:px-8">
           <div className="text-center mb-16">
@@ -198,7 +187,10 @@ export default function Home() {
           </div>
         </div>
       </section>
-      <section id="reviews" className="py-20 bg-white dark:bg-dark-background">
+      <section
+        id="reviews"
+        className="py-20 bg-light-background dark:bg-dark-background"
+      >
         <div className="container mx-auto px-4 md:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-navy-900 mb-4 dark:text-gray-100">
@@ -226,7 +218,7 @@ export default function Home() {
       </section>
       <section
         id="contact"
-        className="py-20 bg-gray-50 dark:bg-dark-background"
+        className="py-20 bg-light-background dark:bg-dark-background"
       >
         <div className="container mx-auto px-4 md:px-6 lg:px-8">
           <div className="max-w-4xl mx-auto bg-white rounded-xl shadow-md overflow-hidden">
