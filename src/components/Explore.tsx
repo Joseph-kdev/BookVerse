@@ -5,7 +5,7 @@ import _ from "lodash";
 import Nav from "./Nav";
 import { booksReducer } from "../config/reducers";
 import { Genres } from "../types";
-
+import { RotateLoader } from "react-spinners";
 
 export default function Explore() {
   const [activeTab, setActiveTab] = useState<string>("our-picks");
@@ -156,32 +156,28 @@ export default function Explore() {
         </div>
 
         {/*Books */}
-        {error && (
-          <div>
-            Something went wrong
-          </div>
-        )}
+        {error && <div>Something went wrong</div>}
         {isLoading ? (
-          <div>
-            Loading..
+          <div className="h-screen flex gap-2 w-full flex-wrap mt-2 justify-evenly lg:col-span-2 lg:ml-5 lg:max-w-[93%] items-center">
+            <RotateLoader size={10} color="#ffc107" />
           </div>
         ) : (
-        <div className="flex gap-2 w-full flex-wrap mt-2 justify-evenly lg:col-span-2 lg:ml-5 lg:max-w-[93%]">
-          {books.map((bk) => (
-            <div key={bk.id}>
-              <Book
-                id={bk.id}
-                title={bk.title}
-                authors={bk.authors}
-                description={bk.description}
-                publisher={bk.publisher}
-                categories={bk.categories}
-                imageLinks={bk.imageLinks}
-                isbnValue={bk.isbnValue}
-              />
-            </div>
-          ))}
-        </div>
+          <div className="flex gap-2 w-full flex-wrap mt-2 justify-evenly lg:col-span-2 lg:ml-5 lg:max-w-[93%]">
+            {books.map((bk) => (
+              <div key={bk.id}>
+                <Book
+                  id={bk.id}
+                  title={bk.title}
+                  authors={bk.authors}
+                  description={bk.description}
+                  publisher={bk.publisher}
+                  categories={bk.categories}
+                  imageLinks={bk.imageLinks}
+                  isbnValue={bk.isbnValue}
+                />
+              </div>
+            ))}
+          </div>
         )}
       </div>
     </section>
