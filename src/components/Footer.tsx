@@ -8,7 +8,7 @@ const Footer: React.FC = () => {
         <div className="grid grid-cols-1 gap-8">
           <div className="md:col-span-1">
             <div className="flex items-center mb-4 justify-center flex-col">
-              <div className='flex mb-2'>
+              <div className='flex mb-4'>
               <BookOpen className="h-8 w-8 text-amber-500" />
               <span className="ml-2 text-xl font-bold">BookVerse</span>
               </div>
@@ -16,14 +16,14 @@ const Footer: React.FC = () => {
               Your digital library, personalized and organized.
             </p>
             <div className="flex space-x-4">
-              <a href="#" className="text-gray-400 hover:text-white transition-colors">
+              <a href="https://twitter.com/MuchaiJoseph_" target='_blank' className="text-gray-400 hover:text-white transition-colors">
                 Twitter
               </a>
-              <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                Instagram
+              <a href="https://github.com/Joseph-kdev" target="_blank" className="text-gray-400 hover:text-white transition-colors">
+                Github
               </a>
-              <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                Facebook
+              <a href="https://www.linkedin.com/in/joseph-muchai-968688253" target='_blank' className="text-gray-400 hover:text-white transition-colors">
+                LinkedIn
               </a>
             </div>
             </div>

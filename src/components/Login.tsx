@@ -77,7 +77,7 @@ export default function Login() {
         </svg>
       </div>
           <div className="flex justify-center mb-6">
-            <img src="know.png" alt="logo" className="h-[80px] mx-1" />
+            <img src="/bestseller.svg" alt="logo" className="h-[80px] mx-1" />
           </div>
           {user.hasAccount ? (
             <h1 className="text-3xl font-semibold mb-6 text-light-background dark:text-dark-background text-center">

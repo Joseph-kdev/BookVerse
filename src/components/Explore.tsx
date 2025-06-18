@@ -129,7 +129,7 @@ export default function Explore() {
           </div>
           {/* Genre Grid */}
           <div className="">
-            <div className="flex overflow-scroll scroll-smooth lg:grid lg:grid-cols-2 lg:gap-2 lg:overflow-hidden mt-1 font-">
+            <div className="flex overflow-scroll scroll-smooth lg:grid lg:grid-cols-2 lg:gap-2 lg:overflow-hidden mt-1 font-Oxanium text-sm">
               {genres[activeTab].map((genre: string) => (
                 <button
                   key={genre}
@@ -156,13 +156,20 @@ export default function Explore() {
         </div>
 
         {/*Books */}
-        {error && <div>Something went wrong</div>}
+        {error && (
+          <div className="flex flex-col items-center mt-4 w-full h-full">
+            <img src="/sad-pup.svg" width={400} alt="" />
+            <p className="text-sm font-Oxanium mt-1 text-red-500">
+              Something went wrong!
+            </p>
+          </div>
+        )}
         {isLoading ? (
           <div className="h-screen flex gap-2 w-full flex-wrap mt-2 justify-evenly lg:col-span-2 lg:ml-5 lg:max-w-[93%] items-center">
             <RotateLoader size={10} color="#ffc107" />
           </div>
         ) : (
-          <div className="flex gap-2 w-full flex-wrap mt-2 justify-evenly lg:col-span-2 lg:ml-5 lg:max-w-[93%]">
+          <div className="flex gap-2 w-full flex-wrap mt-2 justify-evenly lg:col-span-2 lg:ml-5 lg:max-w-[93%] lg:grid lg:grid-cols-5">
             {books.map((bk) => (
               <div key={bk.id}>
                 <Book

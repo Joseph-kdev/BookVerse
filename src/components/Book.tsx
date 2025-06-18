@@ -49,7 +49,7 @@ export default function Book({
         <div className="w-full">
           <a onClick={openModal} className="cursor-pointer">
             <img
-              src={imageLinks?.thumbnail}
+              src={imageLinks?.thumbnail || "https://placehold.co/600x400/000000/FFFFFF/png"}
               alt="book cover"
               className="w-full h-[180px]"
             />

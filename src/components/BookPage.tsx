@@ -18,6 +18,7 @@ import { Bot, Download } from "lucide-react";
 import Modal from "react-modal";
 import BookChat from "./Chat";
 import { ClockLoader } from "react-spinners";
+import toast from "react-hot-toast";
 
 export default function BookPage() {
   const { title } = useParams();
@@ -26,7 +27,7 @@ export default function BookPage() {
   const [bookInCollection, setBookInCollection] = useState({
     "reading-list": false,
     "already-read": false,
-    favorite: false,
+    "favorite": false,
   });
   const { user } = useUserAuthContext();
   const [open, setOpen] = useState(false);
@@ -37,6 +38,10 @@ export default function BookPage() {
 
   const toggleBookLibrary = async (listType: string, action: string) => {
     if (!user) {
+      toast.error("You have to be logged in!!", {
+        duration: 3000,
+        position: "top-center",
+      });
       console.log("You have to be logged in");
       return;
     }
@@ -60,6 +65,11 @@ export default function BookPage() {
             isbnValue: bookData.isbnValue || [],
           });
           setBookInCollection((prev) => ({ ...prev, [listType]: true }));
+          toast.success(`${bookData.title} added to ${listType}`, {
+            duration: 4000,
+            position: "top-center",
+            className: 'text-sm text-light-text'
+          });
           console.log(`${bookData.title} added to ${listType}`);
         } else {
           console.log("Cannot remove non-existent book");
@@ -71,6 +81,12 @@ export default function BookPage() {
         } else if (action === "remove") {
           await deleteDoc(docRef);
           setBookInCollection((prev) => ({ ...prev, [listType]: false }));
+          toast.success(`${bookData.title} removed from ${listType}`, {
+            duration: 4000,
+            position: "top-center",
+            icon: "❌",
+            className: "text-sm text-light-text"
+          });
           console.log(`${bookData.title} removed from ${listType}`);
         }
       }
@@ -110,8 +126,6 @@ export default function BookPage() {
     queryFn: () => getDownloadLinks(bookData.title),
     initialData: [],
   });
-
-  console.log("fetched links", links);
 
   return (
     <div className="bg-light-background dark:bg-dark-background h-screen">

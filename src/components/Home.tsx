@@ -2,13 +2,7 @@ import Nav from "./Nav";
 import { Link } from "react-router-dom";
 import { useUserAuthContext } from "../config/UserAuthContext";
 import FeatureCard from "../ui/FeatureCard";
-import {
-  BookCheck,
-  BookMarked,
-  Download,
-  Heart,
-  MessageSquare,
-} from "lucide-react";
+import { BookMarked, Download, Heart, Layers, Search, Bot } from "lucide-react";
 import ReviewCard from "../ui/ReviewCard";
 import { useState } from "react";
 import Footer from "./Footer";
@@ -18,64 +12,70 @@ export default function Home() {
 
   const features = [
     {
-      title: "Reading Lists",
+      title: "Smart Reading Lists",
       description:
-        "Create and organize multiple reading lists based on genres, themes, or your own custom categories.",
+        "Create personalized reading lists to organize your 'to-read', 'currently reading', and 'finished' books with ease.",
       icon: BookMarked,
     },
     {
-      title: "Favorites Collection",
+      title: "Favorites at Your Fingertips",
       description:
-        "Keep track of your all-time favorite books and easily share recommendations with friends.",
+        "Instantly access your favorite books and build a collection that reflects your literary taste.",
       icon: Heart,
     },
     {
-      title: "Reading Progress",
+      title: "Genre-Based Discovery",
       description:
-        "Mark books as read, in-progress, or on-hold and track your reading statistics over time.",
-      icon: BookCheck,
+        "Browse books by genre and uncover new reads tailored to your mood or interests.",
+      icon: Layers, // Consider using a genre/discovery-related icon if available
     },
     {
-      title: "Book Downloads",
+      title: "Powerful Book Search",
       description:
-        "Download free e-books or purchase new releases directly through our integrated marketplace.",
+        "Search by title, author, or keywords and get quick, accurate results from a rich dataset.",
+      icon: Search, // Or FileSearch
+    },
+    {
+      title: "Download & Access Easily",
+      description:
+        "Get free download links for books—no more hunting across sketchy sites.",
       icon: Download,
     },
     {
-      title: "Book Reviews",
+      title: "Built-in Book Assistant",
       description:
-        "Write and share your thoughts on the books you've read with our vibrant community.",
-      icon: MessageSquare,
+        "Each book page features an AI chatbot that offers summaries, insights, and recommendations tailored to that title.",
+      icon: Bot, // Or MessageCircle if Bot isn't available
     },
   ];
 
   const reviews = [
     {
-      name: "Emma Wilson",
-      role: "Avid Reader",
+      name: "Lena Wendy",
+      role: "University Student",
       review:
-        "BookVerse has completely transformed how I organize my reading. I love being able to track my progress and discover new books based on my preferences.",
+        "I used to jot down my reading lists in random notes, but BookVerse changed everything. I can now track what I'm reading, mark books as finished, and even get recommendations through the chatbot. It’s my new digital bookshelf!",
       rating: 5,
       image:
-        "https://images.pexels.com/photos/1065084/pexels-photo-1065084.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
+        "https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=800",
     },
     {
-      name: "Michael Chen",
-      role: "Book Club Organizer",
+      name: "James Steinbeck",
+      role: "Freelance Writer",
       review:
-        "Our book club uses BookVerse to coordinate our reading selections. The interface is intuitive and the recommendations are spot on!",
+        "BookVerse's download feature is a game-changer. I no longer waste time searching the web—one click and I have what I need. Plus, exploring by genre helps me break out of my usual reading rut.",
       rating: 5,
       image:
-        "https://images.pexels.com/photos/614810/pexels-photo-614810.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
+        "https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=800",
     },
     {
-      name: "Sarah Johnson",
-      role: "English Teacher",
+      name: "Claire",
+      role: "Literature Blogger",
       review:
-        "I recommend BookVerse to all my students. It makes reading tracking simple, and the review feature helps them articulate their thoughts about each book.",
-      rating: 4,
+        "What I love most is the chatbot on each book page. It feels like having a mini book club ready to chat about the book. The insights help me create richer content for my blog.",
+      rating: 5,
       image:
-        "https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
+        "https://images.pexels.com/photos/1130626/pexels-photo-1130626.jpeg?auto=compress&cs=tinysrgb&w=800",
     },
   ];
 
@@ -153,6 +153,7 @@ export default function Home() {
             className="w-full"
           >
             <path
+            className="dark:fill-dark-background"
               fill="#F9F6F0"
               fillOpacity="1"
               d="M0,192L48,197.3C96,203,192,213,288,229.3C384,245,480,267,576,250.7C672,235,768,181,864,170.7C960,160,1056,192,1152,197.3C1248,203,1344,181,1392,170.7L1440,160L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"

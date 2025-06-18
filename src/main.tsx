@@ -3,12 +3,23 @@ import './index.css'
 import App from './App.tsx'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { UserAuthContextProvider } from './config/UserAuthContextProvider.tsx'
+import { Toaster } from 'react-hot-toast'
 
 const queryClient = new QueryClient()
 
 createRoot(document.getElementById('root')!).render(
   <UserAuthContextProvider>
     <QueryClientProvider client={queryClient}>
+      <Toaster
+      position='top-center'
+      reverseOrder={false}
+      gutter={8}
+      toastOptions={{
+        className: "",
+        duration: 5000,
+        removeDelay: 1000,
+      }}
+      />
         <App />
       </QueryClientProvider>
   </UserAuthContextProvider>
