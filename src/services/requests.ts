@@ -123,8 +123,7 @@ export const getDownloadLinks = async (title: string): Promise<BookLinks[]> => {
       return JSON.parse(downloadLinks);
     }
 
-    const response = await axios.get(`${serverUrl}/${title}`);
-    console.log(response);
+    const response = await axios.get(`${serverUrl}/api/book/${title}`);
     const foundLinks: BookLinks[] = response.data.result.map(
       (link: {
         title: string;
