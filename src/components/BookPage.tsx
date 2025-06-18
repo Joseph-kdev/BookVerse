@@ -14,7 +14,10 @@ import {
 import { db } from "../config/firebase-config";
 import { useQuery } from "@tanstack/react-query";
 import { getDownloadLinks } from "../services/requests";
-import { Download } from "lucide-react";
+import { Bot, Download } from "lucide-react";
+import Modal from "react-modal";
+import BookChat from "./Chat";
+import { ClockLoader } from "react-spinners";
 
 export default function BookPage() {
   const { title } = useParams();
@@ -26,6 +29,11 @@ export default function BookPage() {
     favorite: false,
   });
   const { user } = useUserAuthContext();
+  const [open, setOpen] = useState(false);
+
+  const closeModal = () => {
+    setOpen(false);
+  };
 
   const toggleBookLibrary = async (listType: string, action: string) => {
     if (!user) {
@@ -106,7 +114,7 @@ export default function BookPage() {
   console.log("fetched links", links);
 
   return (
-    <div className="bg-light-background dark:bg-dark-background h-full">
+    <div className="bg-light-background dark:bg-dark-background h-screen">
       <Nav />
       <div className="md:hidden">
         <h2 className="text-center font-Rubik_Dirt text-3xl mt-5 z-10">
@@ -118,6 +126,13 @@ export default function BookPage() {
           <div className="hidden md:block">
             <h2 className="font-Rubik_Dirt text-3xl z-10">{title}</h2>
           </div>
+          <button
+            className="bg-gradient-to-tr from-blue-800 via-amber-500 to-stone-900 text-light-text my-4 rounded-full px-4 text-sm flex items-center gap-2 py-1"
+            onClick={() => setOpen(true)}
+          >
+            <Bot size={16} />
+            Ask AI
+          </button>
           <p className="text-lg font-Tilt_Neon md:my-2">Description:</p>
           <p className="text-sm leading-relaxed">{bookData.description}</p>
           <p className="font-Oxanium text-sm mt-4">
@@ -138,9 +153,16 @@ export default function BookPage() {
           <div>
             <p className="my-2 font-Tilt_Neon text-lg">Download links</p>
             {isLoading ? (
-              <p>loading..</p>
+              <div className="w-[100%] h-20 flex justify-center items-center">
+                <ClockLoader size={25} color="#9a5000" />
+              </div>
             ) : isError ? (
-              <p>Error loading links</p>
+              <div className="flex flex-col items-center mt-4">
+                <img src="/sad-pup.svg" width={100} alt="" />
+                <p className="text-sm font-Oxanium mt-1 text-red-500">
+                  Error getting links!!
+                </p>
+              </div>
             ) : (
               <div className="">
                 <div className="shadow-lg rounded-lg">
@@ -179,7 +201,11 @@ export default function BookPage() {
                             {link.size}
                           </td>
                           <td className="px-4 py-4 text-center">
-                            <a href={link.link} className="inline-flex items-center justify-center p-2 rounded-full bg-light-primary" target="_blank">
+                            <a
+                              href={link.link}
+                              className="inline-flex items-center justify-center p-2 rounded-full bg-light-primary"
+                              target="_blank"
+                            >
                               <Download size={20} color="#ffc107" />
                             </a>
                           </td>
@@ -343,6 +369,30 @@ export default function BookPage() {
           </div>
         </div>
       </div>
+      <Modal
+        isOpen={open}
+        onRequestClose={closeModal}
+        contentLabel="Chat About Stuff"
+        ariaHideApp={false}
+        shouldCloseOnOverlayClick={true}
+        style={{
+          overlay: {
+            backgroundColor: "#4e4b4bf4",
+          },
+          content: {
+            display: "flex",
+            flexDirection: "column",
+            height: "80%",
+            width: "80%",
+            margin: "auto",
+            backgroundColor: "#091235",
+            border: "none",
+            padding: "0",
+          },
+        }}
+      >
+        <BookChat title={bookData.title} author={bookData.authors[0]} />
+      </Modal>
     </div>
   );
 }

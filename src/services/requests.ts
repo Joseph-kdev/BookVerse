@@ -115,9 +115,7 @@ export const getGenreBooks = async (genre: string): Promise<GoogleBook[]> => {
   }
 };
 
-export const getDownloadLinks = async (
-  title: string,
-): Promise<BookLinks[]> => {
+export const getDownloadLinks = async (title: string): Promise<BookLinks[]> => {
   try {
     const downloadLinks = sessionStorage.getItem(`${title}`);
 
@@ -146,10 +144,103 @@ export const getDownloadLinks = async (
         pages: link.pages,
       })
     );
-    sessionStorage.setItem(`${title}`, JSON.stringify(foundLinks))
-    return foundLinks
+    sessionStorage.setItem(`${title}`, JSON.stringify(foundLinks));
+    return foundLinks;
   } catch (error) {
     console.error("Error fetching links", error);
     throw new Error("Failed to fetch links");
+  }
+};
+
+export const chatAboutBook = async ({
+  title,
+  author,
+  message,
+  sessionId,
+  onChunk,
+  onComplete,
+  onError,
+}: {
+  title: string;
+  author: string;
+  message: string;
+  sessionId: string;
+  onChunk: (text: string, sessionId: string) => void;
+  onComplete: () => void;
+  onError: (error: string) => void;
+}) => {
+  try {
+    const response = await fetch(`${serverUrl}/api/chat`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ title, author, message, sessionId }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+
+    const contentType = response.headers.get("Content-Type");
+    if (!contentType?.includes("text/event-stream")) {
+      throw new Error("Expected event-stream response");
+    }
+
+    const reader = response.body?.getReader();
+    if (!reader) {
+      throw new Error("Unable to read response stream");
+    }
+
+    const decoder = new TextDecoder();
+    let buffer = "";
+
+    try {
+      while (true) {
+        const { done, value } = await reader.read();
+
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+
+        const lines = buffer.split("\n");
+        buffer = lines.pop() || "";
+
+        let currentEvent = "";
+
+        for (const line of lines) {
+          if (line.trim() === "") continue;
+
+          if (line.startsWith("event: ")) {
+            currentEvent = line.slice(7).trim();
+          } else if (line.startsWith("data: ")) {
+            const dataStr = line.slice(6);
+            if (dataStr.trim() === "") continue;
+
+            try {
+              const data = JSON.parse(dataStr);
+
+              if (currentEvent === "end") {
+                onComplete();
+                return;
+              } else if(currentEvent === 'error') {
+                onError(data.error || 'Stream error occurred');
+                return
+              } else if (data.text && data.sessionId) {
+                onChunk(data.text, data.sessionId)
+              }
+            } catch (error) {
+              console.warn('Failed to parse SSE data:', error)
+            }
+            currentEvent = "";
+          }
+        }
+      }
+    } finally{
+      reader.releaseLock()
+    }
+  } catch (error) {
+    console.log("Error in chat", error);
+    onError(error instanceof Error ? error.message : "Unknown error occurred");
   }
 };
