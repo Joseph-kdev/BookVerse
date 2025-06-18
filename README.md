@@ -1,50 +1,79 @@
-# React + TypeScript + Vite
+# BookVerse
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+BookVerse is a modern web application designed to revolutionize your digital reading experience. It serves as your personal digital bookshelf, allowing you to discover, organize, and download books, as well as leverage AI-powered insights and recommendations for each title.
 
-Currently, two official plugins are available:
+#### Live preview
+<https://bookvs.pages.dev/>
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Key Features
 
-## Expanding the ESLint configuration
+- **Personalized Digital Bookshelf:** Track your reading list, mark books as finished, and manage your favorites.
+- **Book Discovery by Genre:** Easily explore and discover books by genres and categories.
+- **Instant Download Links:** Get free download links for books without searching through unreliable sources.
+- **Built-in Book Assistant:** Each book page features an AI chatbot that provides summaries, insights, and tailored recommendations.
+- **Seamless User Authentication:** Securely manage your book collections with user authentication.
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+## Technologies Used
 
-- Configure the top-level `parserOptions` property like this:
+- **Frontend:** React, TypeScript, Vite
+- **Styling:** Tailwind CSS
+- **State/Data Management:** @tanstack/react-query, React Context API
+- **APIs:** Google Books API (for books and metadata), Consumet API for download links and the new Google GEN-AI SDK for the chatbot.
+- **Authentication & Storage:** Firebase
+- **Other Libraries:**
+  - `axios` (API requests)
+  - `lucide-react` (icons)
+  - `react-modal`, `react-hot-toast`, `react-spinners` (UI/UX enhancements)
+  - `lodash` (utility functions)
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+> See the full list of dependencies in [package.json](https://github.com/Joseph-kdev/BookVerse/blob/main/package.json).
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+## Getting Started
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
+### Prerequisites
 
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
-```
+- Node.js (v18+ recommended)
+- npm or yarn
+
+### Setup Instructions
+
+1. **Clone the repository:**
+
+   ```bash
+   git clone https://github.com/Joseph-kdev/BookVerse.git
+   cd BookVerse
+   ```
+
+2. **Install dependencies:**
+
+   ```bash
+   npm install
+   ```
+
+3. **Configure Environment Variables:**
+   - Create the `.env` file and fill in your API keys (Google Books API, Firebase, backend endpoint etc.)
+
+4. **Run the development server:**
+
+   ```bash
+   npm run dev
+   ```
+
+5. **Open in your browser:**
+   - Visit `http://localhost:5173` (or the port shown in the terminal)
+
+## Project Structure
+
+- `src/components/`: UI components (Home, BookPage, Book, etc.)
+- `src/services/`: API and data fetching logic
+- `src/`: Main application code
+
+## Contributing
+
+Pull requests are welcome! For major changes, please open an issue first to discuss what you would like to change.
+
+## License
+
+MIT
+
+---
