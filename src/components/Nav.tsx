@@ -99,7 +99,7 @@ export default function Nav() {
             </svg>
           </div>
         )} */}
-      <div className="absolute right-2 top-[92vh] bg-light-background dark:bg-dark-background rounded-full cursor-pointer p-1">
+      {/* <div className="absolute right-2 top-[92vh] bg-light-background dark:bg-dark-background rounded-full cursor-pointer p-1">
         <div className=" bg-light-background dark:bg-dark-background rounded-full cursor-pointer p-1">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -117,7 +117,7 @@ export default function Nav() {
             />
           </svg>
         </div>
-      </div>
+      </div> */}
     </nav>
   );
 }
