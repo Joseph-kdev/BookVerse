@@ -106,7 +106,7 @@ export default function Explore() {
           {/* Tabs Navigation */}
           <div className="relative">
             <div className="overflow-x-auto scrollbar-hide">
-              <div className="inline-flex min-w-full bg-light-secondary dark:bg-dark-secondary rounded-lg p-1 justify-evenly font-Oxanium">
+              <div className="inline-flex min-w-full bg-light-secondary dark:bg-dark-secondary md:rounded-lg p-2 justify-evenly font-Oxanium">
                 {tabs.map((tab) => (
                   <button
                     key={tab.id}

@@ -98,8 +98,7 @@ const BookChat = ({title, author} : {title: string; author: string}) => {
 
   return (
     <div className="min-h-full bg-light-background dark:bg-dark-background flex flex-col">
-      {/* Header */}
-      <header className="bg-light-background border-b border-gray-200 px-4 py-4 dark:bg-dark-background">
+      <header className="bg-light-background border-b border-gray-200 px-1 md:px-4 py-4 dark:bg-dark-background">
         <div className="max-w-4xl mx-auto flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <div className="bg-light-accent dark:bg-dark-secondary rounded-full w-10 h-10 flex items-center justify-center">
@@ -161,9 +160,9 @@ const BookChat = ({title, author} : {title: string; author: string}) => {
       )}
 
       {/* Input */}
-      <div className="border-t border-gray-200 bg-white dark:bg-dark-background px-4 py-4">
+      <div className="border-t border-gray-200 bg-white dark:bg-dark-background px-1 md:px-4 py-4">
         <div className="max-w-4xl mx-auto">
-          <div className="flex space-x-4">
+          <div className="flex space-x-4 items-center">
             <div className="flex-1 relative">
               <textarea
                 ref={textareaRef}
@@ -172,14 +171,14 @@ const BookChat = ({title, author} : {title: string; author: string}) => {
                 onKeyPress={handleKeyPress}
                 placeholder="Ask something about the book..."
                 rows={1}
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-light-accent focus:border-light-accent outline-none resize-none transition-colors"
+                className="w-full px-2 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-light-accent focus:border-light-accent outline-none resize-none transition-colors"
                 disabled={isLoading}
               />
             </div>
             <button
               onClick={handleSendMessage}
               disabled={!currentMessage.trim() || isLoading}
-              className="bg-light-accent text-white hover:text-light-text p-2 rounded-xl hover:bg-dark-secondary focus:ring-2 focus:bg-dark-secondary focus:ring-offset-2 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors md:w-14 flex justify-center items-center"
+              className="bg-light-accent text-white hover:text-light-text p-3 rounded-xl hover:bg-dark-secondary focus:ring-2 focus:bg-dark-secondary focus:ring-offset-2 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors md:w-14 flex justify-center items-center"
             >
               {isLoading ? (
                 <Loader2 className="w-5 h-5 animate-spin" />

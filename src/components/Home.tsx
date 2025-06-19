@@ -27,13 +27,13 @@ export default function Home() {
       title: "Genre-Based Discovery",
       description:
         "Browse books by genre and uncover new reads tailored to your mood or interests.",
-      icon: Layers, // Consider using a genre/discovery-related icon if available
+      icon: Layers, 
     },
     {
       title: "Powerful Book Search",
       description:
         "Search by title, author, or keywords and get quick, accurate results from a rich dataset.",
-      icon: Search, // Or FileSearch
+      icon: Search, 
     },
     {
       title: "Download & Access Easily",
@@ -45,7 +45,7 @@ export default function Home() {
       title: "Built-in Book Assistant",
       description:
         "Each book page features an AI chatbot that offers summaries, insights, and recommendations tailored to that title.",
-      icon: Bot, // Or MessageCircle if Bot isn't available
+      icon: Bot, 
     },
   ];
 
@@ -103,10 +103,7 @@ export default function Home() {
     <div className='bg-[url("/homebg.jpg")] bg-center bg-cover bg-fixed'>
       <Nav />
       <section className="relative min-h-screen flex items-center pt-16 overflow-hidden">
-        {/* Background Pattern */}
         <div className="absolute inset-0 bg-[rgb(0,0,0,0.6)]"></div>
-
-        {/* Content */}
         <div className="container mx-auto px-4 md:px-6 lg:px-8 z-10 mb-28">
           <div className="flex flex-col lg:flex-row items-center">
             <div className="lg:w-1/2 mb-12 lg:mb-0">
@@ -120,7 +117,7 @@ export default function Home() {
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4">
-                <button className="animate-fadeInDelayLong bg-light-accent p-4 rounded-md flex items-center">
+                <button className="animate-fadeInDelayLong bg-light-accent p-4 rounded-md flex items-center w-40">
                   <Link to={user ? "/explore" : "/login"}>Get Started</Link>
                   <svg
                     xmlns="http://www.w3.org/2000/svg"

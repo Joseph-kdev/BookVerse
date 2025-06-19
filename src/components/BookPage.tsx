@@ -27,7 +27,7 @@ export default function BookPage() {
   const [bookInCollection, setBookInCollection] = useState({
     "reading-list": false,
     "already-read": false,
-    "favorite": false,
+    favorite: false,
   });
   const { user } = useUserAuthContext();
   const [open, setOpen] = useState(false);
@@ -68,7 +68,7 @@ export default function BookPage() {
           toast.success(`${bookData.title} added to ${listType}`, {
             duration: 4000,
             position: "top-center",
-            className: 'text-sm text-light-text'
+            className: "text-sm text-light-text",
           });
           console.log(`${bookData.title} added to ${listType}`);
         } else {
@@ -85,7 +85,7 @@ export default function BookPage() {
             duration: 4000,
             position: "top-center",
             icon: "❌",
-            className: "text-sm text-light-text"
+            className: "text-sm text-light-text",
           });
           console.log(`${bookData.title} removed from ${listType}`);
         }
@@ -396,10 +396,15 @@ export default function BookPage() {
           content: {
             display: "flex",
             flexDirection: "column",
+            top: "50%",
+            left: "50%",
+            right: "auto",
+            bottom: "auto",
+            marginRight: "-50%",
+            transform: "translate(-50%, -50%)",
             height: "80%",
-            width: "80%",
+            width: "92%",
             margin: "auto",
-            backgroundColor: "#091235",
             border: "none",
             padding: "0",
           },

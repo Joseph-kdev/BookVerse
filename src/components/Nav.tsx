@@ -16,7 +16,7 @@ export default function Nav() {
   };
 
   return (
-    <nav className="flex justify-between p-1 md:px-4 bg-light-background dark:bg-dark-background sticky top-0 items-center text-light-background dark:text-dark-background z-50">
+    <nav className="flex justify-between p-2 md:px-4 bg-light-background dark:bg-dark-background sticky top-0 items-center text-light-background dark:text-dark-background z-50">
       <div className="flex items-center">
         <BookOpen className="h-8 w-8 text-amber-500" />
         <span className="absolute left-12 ml-2 text-xl font-bold text-light-text dark:text-dark-text hidden md:block">
