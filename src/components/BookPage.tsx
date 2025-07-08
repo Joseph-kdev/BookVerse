@@ -128,6 +128,7 @@ export default function BookPage() {
         duration: 3000,
         position: "top-center",
       });
+      setStatus("Want to Read")
       return;
     }
     try {
