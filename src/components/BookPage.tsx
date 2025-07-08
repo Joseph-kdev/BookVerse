@@ -1,20 +1,19 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useParams } from "react-router-dom";
-import { GoogleBook } from "../types";
+import { GoogleBook, StatusEnum } from "../types";
 import Nav from "./Nav";
 import { useUserAuthContext } from "../config/UserAuthContext";
-import {
-  addDoc,
-  collection,
-  deleteDoc,
-  getDocs,
-  query,
-  where,
-} from "firebase/firestore";
-import { db } from "../config/firebase-config";
 import { useQuery } from "@tanstack/react-query";
-import { getDownloadLinks } from "../services/requests";
-import { Bot, Download } from "lucide-react";
+import {
+  addBookToDb,
+  checkFavorite,
+  checkStatus,
+  getDownloadLinks,
+  removeBookFromLibrary,
+  saveBookToLibrary,
+  toggleFavorite,
+} from "../services/requests";
+import { BookCheckIcon, BookmarkPlusIcon, BookOpenTextIcon, Bot, Download } from "lucide-react";
 import Modal from "react-modal";
 import BookChat from "./Chat";
 import { ClockLoader } from "react-spinners";
@@ -25,98 +24,247 @@ export default function BookPage() {
   const location = useLocation();
   const bookData = location.state as GoogleBook;
   const [bookInCollection, setBookInCollection] = useState({
-    "reading-list": false,
-    "already-read": false,
-    favorite: false,
+    "reading_list": false,
+    "completed": false,
+    "reading": false,
+    "favorite": false,
   });
-  const { user } = useUserAuthContext();
-  const [open, setOpen] = useState(false);
+  const [loading, setloading] = useState(false);
+  const [error, setError] = useState(null);
 
+  const { user } = useUserAuthContext();
+  //status button
+  const [status, setStatus] = useState("Want to Read");
+  const [isOpen, setIsOpen] = useState(false);
+  const handleStatusChange = async (
+    newStatus: React.SetStateAction<string>,
+    statusType: StatusEnum
+  ) => {
+    try {
+      setloading(true);
+      await toggleBookLibrary(statusType, "add");
+      setStatus(newStatus);
+      setIsOpen(false);
+    } catch (error: any) {
+      setError(error);
+    } finally {
+      setloading(false);
+    }
+  };
+  useEffect(() => {
+    if (bookInCollection["completed"]) {
+      setStatus("Read");
+    } else if (bookInCollection["reading"]) {
+      setStatus("Currently Reading");
+    } else if (bookInCollection["reading_list"]) {
+      setStatus("Want to Read");
+    } else {
+      setStatus("Want to Read"); // Default status
+    }
+  }, [bookInCollection]);
+
+  const hasStatus = () => {
+    return (
+      bookInCollection["completed"] ||
+      bookInCollection["reading"] ||
+      bookInCollection["reading_list"]
+    );
+  };
+  // Define styles based on status
+  const getButtonStyles = () => {
+    switch (status) {
+      case "Want to Read":
+        return "bg-blue-600 hover:bg-blue-700";
+      case "Currently Reading":
+        return "bg-yellow-600 hover:bg-yellow-700";
+      case "Read":
+        return "bg-green-600 hover:bg-green-700";
+      default:
+        return "bg-gray-700 hover:bg-gray-600";
+    }
+  };
+  const getStatusContent = () => {
+  if (bookInCollection["completed"]) {
+    return (
+      <div className="flex items-center gap-1">
+        <BookCheckIcon width={20} />
+        Read
+      </div>
+    );
+  }
+  if (bookInCollection["reading"]) {
+    return (
+      <div className="flex items-center gap-1">
+        <BookOpenTextIcon width={20} />
+        Currently Reading
+      </div>
+    );
+  }
+  if (bookInCollection["reading_list"]) {
+    return (
+      <div className="flex items-center gap-1">
+        <BookmarkPlusIcon width={20} />
+        Want to Read
+      </div>
+    );
+  }
+  return (
+    <div className="flex items-center gap-1">
+      <BookmarkPlusIcon width={20} />
+      Want to Read
+    </div>
+  );
+};
+
+  //AI modal
+  const [open, setOpen] = useState(false);
   const closeModal = () => {
     setOpen(false);
   };
 
-  const toggleBookLibrary = async (listType: string, action: string) => {
+  const toggleBookLibrary = async (status: StatusEnum, action: string) => {
     if (!user) {
       toast.error("You have to be logged in!!", {
         duration: 3000,
         position: "top-center",
       });
-      console.log("You have to be logged in");
       return;
     }
-
-    const collectionRef = collection(db, `users/${user.uid}/${listType}`);
-
     try {
-      const bookQuery = query(collectionRef, where("id", "==", bookData.id));
-      const querySnapshot = await getDocs(bookQuery);
-
-      if (querySnapshot.empty) {
-        if (action === "add") {
-          await addDoc(collectionRef, {
-            id: bookData.id,
-            title: bookData.title,
-            authors: bookData.authors,
-            description: bookData.description,
-            imageLinks: bookData.imageLinks,
-            publisher: bookData.publisher,
-            categories: bookData.categories,
-            isbnValue: bookData.isbnValue || [],
-          });
-          setBookInCollection((prev) => ({ ...prev, [listType]: true }));
-          toast.success(`${bookData.title} added to ${listType}`, {
-            duration: 4000,
-            position: "top-center",
-            className: "text-sm text-light-text",
-          });
-          console.log(`${bookData.title} added to ${listType}`);
-        } else {
-          console.log("Cannot remove non-existent book");
-        }
-      } else {
-        const docRef = querySnapshot.docs[0].ref;
-        if (action === "add") {
-          console.log("already saved");
-        } else if (action === "remove") {
-          await deleteDoc(docRef);
-          setBookInCollection((prev) => ({ ...prev, [listType]: false }));
-          toast.success(`${bookData.title} removed from ${listType}`, {
-            duration: 4000,
-            position: "top-center",
-            icon: "❌",
-            className: "text-sm text-light-text",
-          });
-          console.log(`${bookData.title} removed from ${listType}`);
-        }
+      if (action === "add") {
+        await addBookToDb({
+          id: bookData.id,
+          title: bookData.title,
+          authors: bookData.authors,
+          description: bookData.description,
+          imageLinks: bookData.imageLinks,
+          publisher: bookData.publisher,
+          categories: bookData.categories,
+          isbnValue: bookData.isbnValue || [],
+        });
+        await saveBookToLibrary({
+          userId: user.uid,
+          bookId: bookData.id,
+          status: status,
+        });
+        setBookInCollection((prev) => ({ ...prev, [status]: true }));
+        toast.success(`${bookData.title} added to ${status}`, {
+          duration: 4000,
+          position: "top-center",
+          icon: "✅",
+          className: "text-sm text-light-text",
+        });
+        console.log(`${bookData.title} added to ${status}`);
+        return;
+      } else if (action === "remove") {
+        await removeBookFromLibrary({
+          userId: user.uid,
+          bookId: bookData.id,
+          status: status,
+        });
+        setBookInCollection((prev) => ({ ...prev, [status]: false }));
+        toast.success(`${bookData.title} removed from ${status}`, {
+          duration: 4000,
+          position: "top-center",
+          icon: "❌",
+          className: "text-sm text-light-text",
+        });
+        console.log(`${bookData.title} removed from ${status}`);
       }
     } catch (error) {
-      console.log("Error adding books", error);
+      console.log("Error adding book", error);
+      toast.error("Error adding book");
     }
   };
 
+  const handleFavorite = async (userId: string, bookId: string) => {
+    if (!userId) {
+      toast.error("You have to be logged in!!", {
+        duration: 3000,
+        position: "top-center",
+      });
+      return;
+    }
+    try {
+      await addBookToDb({
+        id: bookData.id,
+        title: bookData.title,
+        authors: bookData.authors,
+        description: bookData.description,
+        imageLinks: bookData.imageLinks,
+        publisher: bookData.publisher,
+        categories: bookData.categories,
+        isbnValue: bookData.isbnValue || [],
+      });
+      await toggleFavorite({ userId, bookId });
+      if (bookInCollection["favorite"] == false) {
+        setBookInCollection((prev) => ({ ...prev, favorite: true }));
+        toast.success(`${bookData.title} added to favorites`, {
+          duration: 4000,
+          position: "top-center",
+          icon: "✅",
+          className: "text-sm text-light-text",
+        });
+      } else {
+        setBookInCollection((prev) => ({ ...prev, favorite: false }));
+        toast.success(`${bookData.title} removed from favorites`, {
+          duration: 4000,
+          position: "top-center",
+          icon: "❌",
+          className: "text-sm text-light-text",
+        });
+      }
+    } catch (error) {
+      console.log("Error adding book", error);
+      toast.error("Error adding book");
+    }
+  };
+
+  const handleStatusRemoval = async() => {
+    try {
+      await removeBookFromLibrary({userId: user?.uid, bookId: bookData.id})
+      setBookInCollection(prev => ({...prev, 
+        "completed": false,
+        "reading": false,
+        "reading_list": false
+      }))
+      toast.success(`${bookData.title} removed from your library`)
+    } catch (error) {
+      console.log("Error removing status", error)
+      toast.error("Error removing book from library");
+    }
+  }
+  //check if the book is in the user's library
   useEffect(() => {
     const checkBookExistence = async () => {
       if (!user) return;
-      const checkList = async (listType: string) => {
-        const collectionRef = collection(db, `users/${user.uid}/${listType}`);
-        const bookQuery = query(collectionRef, where("id", "==", bookData.id));
-        const querySnapshot = await getDocs(bookQuery);
+      const bookQuery = await checkStatus({
+        userId: user.uid,
+        bookId: bookData.id,
+      });
 
-        setBookInCollection((prev) => ({
-          ...prev,
-          [listType]: !querySnapshot.empty,
-        }));
-      };
-
-      await checkList("reading-list");
-      await checkList("already-read");
-      await checkList("favorite");
+      if (bookQuery.length == 0) {
+        return;
+      }
+      console.log("bookquery", bookQuery);
+      setBookInCollection((prev) => ({ ...prev, [bookQuery[0].status]: true }));
+    };
+    const checkBookFavorite = async () => {
+      const bookQuery = await checkFavorite({
+        userId: user?.uid,
+        bookId: bookData.id,
+      });
+      if (bookQuery.length == 0) {
+        return;
+      }
+      setBookInCollection((prev) => ({ ...prev, favorite: true }));
     };
 
     checkBookExistence();
+    checkBookFavorite();
   }, [user, bookData.id]);
 
+  //fetch download links
   const {
     data: links,
     isLoading,
@@ -144,7 +292,7 @@ export default function BookPage() {
             className="bg-gradient-to-tr from-blue-800 via-amber-500 to-stone-900 text-light-text my-4 rounded-full px-4 text-sm flex items-center gap-2 py-1"
             onClick={() => setOpen(true)}
           >
-            <Bot size={16} />
+            <Bot size={16} className="animate-pulse"/>
             Ask AI
           </button>
           <p className="text-lg font-Tilt_Neon md:my-2">Description:</p>
@@ -239,108 +387,78 @@ export default function BookPage() {
             className="md:w-[350px]"
           />
           <div className="">
-            <div className="md:grid md:grid-cols-2 md:gap-2">
+            <div className="relative inline-block text-left w-full">
               <button
-                onClick={() =>
-                  toggleBookLibrary(
-                    "reading-list",
-                    bookInCollection["reading-list"] ? "remove" : "add"
-                  )
-                }
-                className={`w-full flex items-center gap-1 text-dark-background font-Tilt_Neon p-2 rounded-md md:mt-3 ${
-                  bookInCollection["reading-list"]
-                    ? "bg-red-500 text-light-background"
-                    : "bg-light-accent dark:bg-dark-accent"
-                }`}
+                type="button"
+                className={`inline-flex w-full justify-center gap-x-2 items-center rounded-md bg-gray-700 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-gray-600 ${getButtonStyles()}`}
+                onClick={() => setIsOpen(!isOpen)}
               >
-                {bookInCollection["reading-list"] ? (
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke-width="1.5"
-                    stroke="currentColor"
-                    className="size-4"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      d="M5 12h14"
-                    />
-                  </svg>
-                ) : (
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={1.5}
-                    stroke="currentColor"
-                    className="size-4"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M12 4.5v15m7.5-7.5h-15"
-                    />
-                  </svg>
-                )}
-                <p>Reading List</p>
+                {getStatusContent()}
+                <svg
+                  className="-mr-1 h-5 w-5 text-gray-400"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                  aria-hidden="true"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"
+                    clipRule="evenodd"
+                  />
+                </svg>
               </button>
-              <button
-                className={`w-full flex items-center p-2 rounded-md mt-3 text-dark-background h-10 ${
-                  bookInCollection["already-read"]
-                    ? "bg-light-text text-light-background"
-                    : "bg-light-accent"
-                }`}
-                onClick={() =>
-                  toggleBookLibrary(
-                    "already-read",
-                    bookInCollection["already-read"] ? "remove" : "add"
-                  )
-                }
-              >
-                {bookInCollection["already-read"] ? (
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={1.5}
-                    stroke="currentColor"
-                    className="size-4"
+
+              {isOpen && (
+                <div className="absolute z-10 mt-2 w-44 md:w-48 origin-top-right rounded-md bg-gray-800 shadow-lg ring-1 ring-black ring-opacity-5">
+                  <div
+                    className="py-1"
+                    role="menu"
+                    aria-orientation="vertical"
+                    aria-labelledby="options-menu"
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M6 18 18 6M6 6l12 12"
-                    />
-                  </svg>
-                ) : (
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={1.5}
-                    stroke="currentColor"
-                    className="size-4"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="m4.5 12.75 4 4 9-13.5"
-                    />
-                  </svg>
-                )}
-                <p className="w-full">Already Read</p>
-              </button>
+                    <button
+                      onClick={() =>
+                        handleStatusChange("Want to Read", "reading_list")
+                      }
+                      className="px-4 py-2 text-sm text-gray-200 hover:bg-gray-700 hover:text-white w-full text-left flex items-center gap-2"
+                    >
+                      <BookmarkPlusIcon width={20} />
+                      Want to Read
+                    </button>
+                    <button
+                      onClick={() =>
+                        handleStatusChange("Currently Reading", "reading")
+                      }
+                      className="flex gap-2 px-4 py-2 text-sm text-gray-200 hover:bg-gray-700 hover:text-white w-full text-left"
+                    >
+                      <BookOpenTextIcon width={20} />
+                      Currently Reading
+                    </button>
+                    <button
+                      onClick={() => handleStatusChange("Read", "completed")}
+                      className="flex gap-2 items-center px-4 py-2 text-sm text-gray-200 hover:bg-gray-700 hover:text-white w-full text-left"
+                    >
+                      <BookCheckIcon width={20} />
+                      Read
+                    </button>
+                    {hasStatus() && (
+                      <div>
+                        <div className="border-t border-gray-600 my-1"></div>
+                        <button
+                          onClick={handleStatusRemoval}
+                          className="block px-4 py-2 text-sm text-red-400 hover:bg-gray-700 hover:text-red-300 w-full text-left"
+                        >
+                          Remove from Library
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
             <div
               className="mt-3 cursor-pointer dark:text-dark-text"
-              onClick={() =>
-                toggleBookLibrary(
-                  "favorite",
-                  bookInCollection["favorite"] ? "remove" : "add"
-                )
-              }
+              onClick={() => handleFavorite(user?.uid, bookData.id)}
             >
               {bookInCollection["favorite"] ? (
                 <button className="flex items-center border-2 border-amber-500 p-1 w-full rounded-md justify-evenly md:p-2">

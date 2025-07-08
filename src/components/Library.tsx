@@ -1,47 +1,44 @@
-import React, { useState } from "react";
-import { BookOpen, Heart, CheckCircle, List } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import {
+  BookOpen,
+  Heart,
+  CheckCircle,
+  List,
+  BookMarkedIcon,
+} from "lucide-react";
 import { useUserAuthContext } from "../config/UserAuthContext";
-import { collection, getDocs } from "firebase/firestore";
-import { db } from "../config/firebase-config";
 import { useQuery } from "@tanstack/react-query";
 import Nav from "./Nav";
 import Book from "./Book";
 import { PropagateLoader } from "react-spinners";
+import { getFavorites, getUserBooks } from "../services/requests";
+import toast from "react-hot-toast";
+import { GoogleBook } from "../types";
 
 export default function Library() {
   const [activeTab, setActiveTab] = useState<
-    "reading-list" | "favorite" | "already-read" | "all"
+    "reading_list" | "favorite" | "completed" | "all" | "reading"
   >("all");
 
   const tabs = [
     { id: "all", label: "All Books", icon: List },
-    { id: "reading-list", label: "Reading list", icon: BookOpen },
     { id: "favorite", label: "Favorites", icon: Heart },
-    { id: "already-read", label: "Completed", icon: CheckCircle },
+    { id: "reading_list", label: "Reading list", icon: BookMarkedIcon },
+    { id: "reading", label: "Reading", icon: BookOpen },
+    { id: "completed", label: "Completed", icon: CheckCircle },
   ];
 
   const { user } = useUserAuthContext();
-  const fetchList = async (listType: string): Promise<any> => {
-    if (listType === "all") {
-      const data = await fetchAll();
-      return data;
+  const fetchAll = async () => {
+    if (!user) {
+      toast.error("You have to be logged in");
+      return;
     }
 
-    const collectionRef = collection(db, `users/${user?.uid}/${listType}`);
-    const querySnapshot = await getDocs(collectionRef);
-    const retrievedData = querySnapshot.docs.map((doc) => ({
-      ...doc.data(),
-    }));
+    const bookLibrary = await getUserBooks(user?.uid);
+    const favorites = await getFavorites(user?.uid);
 
-    return retrievedData;
-  };
-
-  const fetchAll = async () => {
-    const read = await fetchList("already-read");
-    const favorites = await fetchList("favorite");
-    const list = await fetchList("reading-list");
-
-    const allBooks = [...read, ...favorites, ...list];
+    const allBooks = [...bookLibrary, ...favorites];
     const uniqueBooks = Array.from(new Set(allBooks.map((a) => a.id))).map(
       (id) => {
         return allBooks.find((a) => a.id === id);
@@ -55,11 +52,46 @@ export default function Library() {
     isLoading,
     isError,
   } = useQuery({
-    queryKey: ["books", activeTab],
-    queryFn: () => fetchList(activeTab),
+    queryKey: ["books"],
+    queryFn: () => fetchAll(),
     enabled: !!user,
     initialData: [],
   });
+
+  const bookTabs = async (activeTab: string) => {
+    if (!books) {
+      return [];
+    }
+    const booksUnderTab = books.filter((book) => book.status === activeTab);
+    return booksUnderTab;
+  };
+  const [booksToshow, setBooksToshow] = useState<GoogleBook[]>([]);
+
+  useEffect(() => {
+    const fetchFavorites = async () => {
+      const favorites = await getFavorites(user?.uid);
+      if (!favorites) {
+        return [];
+      }
+      return favorites;
+    };
+
+    const showBooks = async () => {
+      if (activeTab === "favorite") {
+        const result = await fetchFavorites();
+        setBooksToshow(result);
+        return;
+      }
+      if (activeTab === "all") {
+        setBooksToshow(books);
+        return;
+      }
+      const result = await bookTabs(activeTab);
+      setBooksToshow(result);
+    };
+
+    showBooks();
+  }, [activeTab, books, user?.uid]);
 
   return (
     <section className="bg-light-background dark:bg-dark-background min-h-screen">
@@ -89,37 +121,33 @@ export default function Library() {
             ))}
           </div>
         </div>
-        {books.length > 0 ? (
-          <div>
-            {isLoading ? (
-              <div className="w-full h-full flex justify-center items-center">
-                <PropagateLoader size={25} color="" />
+        {booksToshow.length > 0 ? (
+          <div className="flex gap-4 w-full">
+            {booksToshow.map((bk, i) => (
+              <div key={i++}>
+                <Book
+                  id={bk.id}
+                  title={bk.title}
+                  authors={bk.authors}
+                  description={bk.description}
+                  publisher={bk.publisher}
+                  categories={bk.categories}
+                  imageLinks={bk.imageLinks}
+                  isbnValue={null}
+                />
               </div>
-            ) : isError ? (
-              <div className="flex flex-col items-center mt-4">
-                <img src="/sad-pup.svg" width={100} alt="" />
-                <p className="text-sm font-Oxanium mt-1 text-red-500">
-                  Error getting books!!
-                </p>
-              </div>
-            ) : (
-              <div className="flex gap-4 w-full">
-                {books.map((bk, i) => (
-                  <div key={i++}>
-                    <Book
-                      id={bk.id}
-                      title={bk.title}
-                      authors={bk.authors}
-                      description={bk.description}
-                      publisher={bk.publisher}
-                      categories={bk.categories}
-                      imageLinks={bk.imageLinks}
-                      isbnValue={null}
-                    />
-                  </div>
-                ))}
-              </div>
-            )}
+            ))}
+          </div>
+        ) : isLoading ? (
+          <div className="w-full h-full flex justify-center items-center">
+            <PropagateLoader size={25} color="#ffc107" />
+          </div>
+        ) : isError ? (
+          <div className="flex flex-col items-center mt-4">
+            <img src="/sad-pup.svg" width={100} alt="" />
+            <p className="text-sm font-Oxanium mt-1 text-red-500">
+              Error getting books!!
+            </p>
           </div>
         ) : (
           <div className="flex flex-col items-center mt-4">

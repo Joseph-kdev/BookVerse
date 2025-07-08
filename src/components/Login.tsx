@@ -7,6 +7,7 @@ import {
   signInWithPopup,
 } from "firebase/auth";
 import { auth, googleProvider } from "../config/firebase-config";
+import toast from "react-hot-toast";
 
 export default function Login() {
   const [user, dispatch] = useReducer(userReducer, {
@@ -33,7 +34,8 @@ export default function Login() {
     const password = user.password;
 
     if (!email || !password) {
-      alert("Please fill in both fields");
+      toast.error("Please fill in both fields");
+      return
     }
 
     try {

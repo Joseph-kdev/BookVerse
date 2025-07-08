@@ -4,11 +4,24 @@ import { useUserAuthContext } from "../config/UserAuthContext";
 import FeatureCard from "../ui/FeatureCard";
 import { BookMarked, Download, Heart, Layers, Search, Bot } from "lucide-react";
 import ReviewCard from "../ui/ReviewCard";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Footer from "./Footer";
+import { addUser } from "../services/requests";
+import { auth } from "../config/firebase-config";
 
 export default function Home() {
   const { user } = useUserAuthContext();
+
+  useEffect(() => {
+    const addUserToDb = async () => {
+      auth.onAuthStateChanged(async(user) => {
+        if (user) {
+          await addUser({ userId: user.uid, email: user.email });
+        }
+      });
+    };
+    addUserToDb();
+  }, []);
 
   const features = [
     {
@@ -27,13 +40,13 @@ export default function Home() {
       title: "Genre-Based Discovery",
       description:
         "Browse books by genre and uncover new reads tailored to your mood or interests.",
-      icon: Layers, 
+      icon: Layers,
     },
     {
       title: "Powerful Book Search",
       description:
         "Search by title, author, or keywords and get quick, accurate results from a rich dataset.",
-      icon: Search, 
+      icon: Search,
     },
     {
       title: "Download & Access Easily",
@@ -45,7 +58,7 @@ export default function Home() {
       title: "Built-in Book Assistant",
       description:
         "Each book page features an AI chatbot that offers summaries, insights, and recommendations tailored to that title.",
-      icon: Bot, 
+      icon: Bot,
     },
   ];
 
@@ -150,7 +163,7 @@ export default function Home() {
             className="w-full"
           >
             <path
-            className="dark:fill-dark-background"
+              className="dark:fill-dark-background"
               fill="#F9F6F0"
               fillOpacity="1"
               d="M0,192L48,197.3C96,203,192,213,288,229.3C384,245,480,267,576,250.7C672,235,768,181,864,170.7C960,160,1056,192,1152,197.3C1248,203,1344,181,1392,170.7L1440,160L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"

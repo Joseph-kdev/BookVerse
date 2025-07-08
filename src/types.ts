@@ -49,3 +49,5 @@ export interface BookLinks {
     size: string;
     pages: string;
 }
+
+export type StatusEnum = "reading" | "reading_list" | "completed";
