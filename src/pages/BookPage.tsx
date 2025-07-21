@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useParams } from "react-router-dom";
 import { GoogleBook, StatusEnum } from "../types";
-import Nav from "./Nav";
+import Nav from "../components/Nav";
 import { useUserAuthContext } from "../config/UserAuthContext";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -15,7 +15,7 @@ import {
 } from "../services/requests";
 import { BookCheckIcon, BookmarkPlusIcon, BookOpenTextIcon, Bot, Download } from "lucide-react";
 import Modal from "react-modal";
-import BookChat from "./Chat";
+import BookChat from "../components/Chat";
 import { ClockLoader } from "react-spinners";
 import toast from "react-hot-toast";
 

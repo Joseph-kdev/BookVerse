@@ -8,8 +8,8 @@ import {
 } from "lucide-react";
 import { useUserAuthContext } from "../config/UserAuthContext";
 import { useQuery } from "@tanstack/react-query";
-import Nav from "./Nav";
-import Book from "./Book";
+import Nav from "../components/Nav";
+import Book from "../components/Book";
 import { PropagateLoader } from "react-spinners";
 import { getFavorites, getUserBooks } from "../services/requests";
 import toast from "react-hot-toast";
@@ -121,42 +121,44 @@ export default function Library() {
             ))}
           </div>
         </div>
-        {booksToshow.length > 0 ? (
-          <div className="flex gap-4 w-full">
-            {booksToshow.map((bk, i) => (
-              <div key={i++}>
-                <Book
-                  id={bk.id}
-                  title={bk.title}
-                  authors={bk.authors}
-                  description={bk.description}
-                  publisher={bk.publisher}
-                  categories={bk.categories}
-                  imageLinks={bk.imageLinks}
-                  isbnValue={null}
-                />
-              </div>
-            ))}
-          </div>
-        ) : isLoading ? (
-          <div className="w-full h-full flex justify-center items-center">
-            <PropagateLoader size={25} color="#ffc107" />
-          </div>
-        ) : isError ? (
-          <div className="flex flex-col items-center mt-4">
-            <img src="/sad-pup.svg" width={100} alt="" />
-            <p className="text-sm font-Oxanium mt-1 text-red-500">
-              Error getting books!!
-            </p>
-          </div>
-        ) : (
-          <div className="flex flex-col items-center mt-4">
-            <img src="/empty.svg" width={400} alt="" />
-            <p className="text-sm font-Oxanium mt-1 text-light-text dark:text-dark-text">
-              Looks like you haven't added anything!
-            </p>
-          </div>
-        )}
+        <div className="flex justify-center w-full">
+          {booksToshow.length > 0 ? (
+            <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 w-full">
+              {booksToshow.map((bk, i) => (
+                <div key={i++}>
+                  <Book
+                    id={bk.id}
+                    title={bk.title}
+                    authors={bk.authors}
+                    description={bk.description}
+                    publisher={bk.publisher}
+                    categories={bk.categories}
+                    imageLinks={bk.imageLinks}
+                    isbnValue={null}
+                  />
+                </div>
+              ))}
+            </div>
+          ) : isLoading ? (
+            <div className="w-full h-full flex justify-center items-center">
+              <PropagateLoader size={25} color="#ffc107" />
+            </div>
+          ) : isError ? (
+            <div className="flex flex-col items-center mt-4">
+              <img src="/sad-pup.svg" width={100} alt="" />
+              <p className="text-sm font-Oxanium mt-1 text-red-500">
+                Error getting books!!
+              </p>
+            </div>
+          ) : (
+            <div className="flex flex-col items-center mt-4">
+              <img src="/empty.svg" width={400} alt="" />
+              <p className="text-sm font-Oxanium mt-1 text-light-text dark:text-dark-text">
+                Looks like you haven't added anything!
+              </p>
+            </div>
+          )}
+        </div>
       </div>
     </section>
   );

@@ -1,11 +1,11 @@
-import Nav from "./Nav";
+import Nav from "../components/Nav";
 import { Link } from "react-router-dom";
 import { useUserAuthContext } from "../config/UserAuthContext";
-import FeatureCard from "../ui/FeatureCard";
+import FeatureCard from "../components/ui/FeatureCard";
 import { BookMarked, Download, Heart, Layers, Search, Bot } from "lucide-react";
-import ReviewCard from "../ui/ReviewCard";
+import ReviewCard from "../components/ui/ReviewCard";
 import { useEffect, useState } from "react";
-import Footer from "./Footer";
+import Footer from "../components/Footer";
 import { addUser } from "../services/requests";
 import { auth } from "../config/firebase-config";
 

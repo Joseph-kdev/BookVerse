@@ -1,8 +1,9 @@
 import React, { useState } from 'react'
 import { searchBooks } from '../services/requests'
 import { GoogleBook } from '../types'
-import Book from './Book'
-import Nav from './Nav'
+import Book from '../components/Book'
+import Nav from '../components/Nav'
+import toast from 'react-hot-toast'
 
 export default function Search() {
   const [book, setBook] = useState("")
@@ -11,7 +12,7 @@ export default function Search() {
   const doSearch = async(event: { preventDefault: () => void }) => {
     event.preventDefault()
     if (book.length === 0) {
-      //add a toast here
+      toast.error("A book title is required")
       return
     }
     const results = await searchBooks(book)

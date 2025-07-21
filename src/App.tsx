@@ -1,11 +1,11 @@
 import React from 'react'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
-import Home from './components/Home'
-import Explore from './components/Explore'
-import Search from './components/Search'
-import Login from './components/Login'
-import Library from './components/Library'
-import BookPage from './components/BookPage'
+import Home from './pages/Home'
+import Search from './pages/Search'
+import Login from './pages/Login'
+import Library from './pages/Library'
+import BookPage from './pages/BookPage'
+import Explore from './pages/Explore'
 
 export default function App() {
   return (

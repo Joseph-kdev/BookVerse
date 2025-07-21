@@ -1,11 +1,11 @@
 import { useEffect, useReducer, useState } from "react";
 import { getGenreBooks } from "../services/requests";
-import Book from "./Book";
 import _ from "lodash";
-import Nav from "./Nav";
 import { booksReducer } from "../config/reducers";
 import { Genres } from "../types";
 import { RotateLoader } from "react-spinners";
+import Nav from "../components/Nav";
+import Book from "../components/Book";
 
 export default function Explore() {
   const [activeTab, setActiveTab] = useState<string>("our-picks");

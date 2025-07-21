@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import { useUserAuthContext } from "../config/UserAuthContext";
 import { signOut } from "firebase/auth";
 import { auth } from "../config/firebase-config";
@@ -25,30 +25,30 @@ export default function Nav() {
       </div>
       <div className="bg-light-primary dark:bg-dark-primary p-2 rounded-full w-[200px] md:min-w-[300px] flex justify-evenly">
         <div>
-          <Link to="/">
+          <NavLink to="/" className={({isActive}) => isActive ? "text-light-accent" : ""}>
             <Home size={24} className="md:hidden"
             />
             <p className="hidden md:block">Home</p>
-          </Link>
+          </NavLink>
         </div>
         <div>
-          <Link to="/explore">
+          <NavLink to="/explore" className={({isActive}) => isActive ? "text-light-accent" : ""}>
             <Compass size={24} className="md:hidden"
             />
             <p className="hidden md:block">Explore</p>
-          </Link>
+          </NavLink>
         </div>
         {user && (
           <div>
-            <Link to="/library">
+            <NavLink to="/library" className={({isActive}) => isActive ? "text-light-accent" : ""}>
               <Library size={24} className="md:hidden"/>
               <p className="hidden md:block">Library</p>
-            </Link>
+            </NavLink>
           </div>
         )}
       </div>
       <div className="ml-1 cursor-pointer">
-        <Link to="/search">
+        <NavLink to="/search" className={({isActive}) => isActive ? "text-light-accent" : ""}>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
@@ -63,7 +63,7 @@ export default function Nav() {
               d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
             />
           </svg>
-        </Link>
+        </NavLink>
       </div>
                 {/* {user && (
           <div className=" bg-light-background dark:bg-dark-primary rounded-full cursor-pointer p-1">
