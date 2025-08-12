@@ -6,6 +6,7 @@ import { Genres } from "../types";
 import { RotateLoader } from "react-spinners";
 import Nav from "../components/Nav";
 import Book from "../components/Book";
+import { AnimatePresence, motion } from "framer-motion";
 
 export default function Explore() {
   const [activeTab, setActiveTab] = useState<string>("our-picks");
@@ -108,7 +109,8 @@ export default function Explore() {
             <div className="overflow-x-auto scrollbar-hide">
               <div className="inline-flex min-w-full bg-light-secondary dark:bg-dark-secondary md:rounded-lg p-2 justify-evenly font-Oxanium">
                 {tabs.map((tab) => (
-                  <button
+                  <motion.button
+                    whileTap={{ scale: 0.95 }}
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
                     className={`
@@ -122,36 +124,49 @@ export default function Explore() {
                     `}
                   >
                     {tab.label}
-                  </button>
+                  </motion.button>
                 ))}
               </div>
             </div>
           </div>
           {/* Genre Grid */}
           <div className="">
-            <div className="flex overflow-scroll scroll-smooth lg:grid lg:grid-cols-2 lg:gap-2 lg:overflow-hidden mt-1 font-Oxanium text-sm">
-              {genres[activeTab].map((genre: string) => (
-                <button
-                  key={genre}
-                  className={`
-                    text-xs max-h-[50px] min-w-[150px]
-                    px-2 py-2 m-1 md:text-sm font-medium
-                     hover:bg-light-accent dark:hover:bg-dark-accent
-                    rounded-lg transition-colors
-                    text-light-background dark:text-dark-background
-                    ${
-                      selectedGenre === genre
-                        ? "bg-[#dfbf90] dark:bg-[#6f4f20] text-gray-900 shadow-sm border border-gray-200"
-                        : "bg-light-primary dark:bg-dark-primary text-gray-900"
-                    }
-                    focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2
-                  `}
-                  onClick={() => findGenreBooks(genre)}
-                >
-                  {_.capitalize(genre)}
-                </button>
-              ))}
-            </div>
+            <AnimatePresence mode="popLayout">
+              <motion.div
+                key={activeTab}
+                initial={{ opacity: 0, scale: 0.6 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.6 }}
+                transition={{
+                  type:"spring",
+                  duration: 0.3
+                }}
+                className="flex overflow-scroll scroll-smooth lg:grid lg:grid-cols-2 lg:gap-2 lg:overflow-hidden mt-1 font-Oxanium text-sm"
+              >
+                {genres[activeTab].map((genre: string) => (
+                  <motion.button
+                    whileTap={{ scale: 0.95 }}
+                    key={genre}
+                    className={`
+                      text-xs max-h-[50px] min-w-[150px]
+                      px-2 py-2 m-1 md:text-sm font-medium
+                      hover:bg-light-accent dark:hover:bg-dark-accent
+                      rounded-lg transition-colors
+                      text-light-background dark:text-dark-background
+                      ${
+                        selectedGenre === genre
+                          ? "bg-[#dfbf90] dark:bg-[#6f4f20] text-gray-900 shadow-sm border border-gray-200"
+                          : "bg-light-primary dark:bg-dark-primary text-gray-900"
+                      }
+                      focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2
+                    `}
+                    onClick={() => findGenreBooks(genre)}
+                  >
+                    {_.capitalize(genre)}
+                  </motion.button>
+                ))}
+              </motion.div>
+            </AnimatePresence>
           </div>
         </div>
 
