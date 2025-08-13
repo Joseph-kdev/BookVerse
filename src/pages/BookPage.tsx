@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useLocation, useParams } from "react-router-dom";
 import { GoogleBook, StatusEnum } from "../types";
 import Nav from "../components/Nav";
@@ -13,29 +13,38 @@ import {
   saveBookToLibrary,
   toggleFavorite,
 } from "../services/requests";
-import { BookCheckIcon, BookmarkPlusIcon, BookOpenTextIcon, Bot, Download } from "lucide-react";
-import Modal from "react-modal";
+import {
+  BookCheckIcon,
+  BookmarkPlusIcon,
+  BookOpenTextIcon,
+  Bot,
+  Download,
+} from "lucide-react";
 import BookChat from "../components/Chat";
 import { ClockLoader } from "react-spinners";
 import toast from "react-hot-toast";
+import { AnimatePresence, motion } from "framer-motion";
+import { useOnClickOutside } from "usehooks-ts";
 
 export default function BookPage() {
   const { title } = useParams();
   const location = useLocation();
   const bookData = location.state as GoogleBook;
   const [bookInCollection, setBookInCollection] = useState({
-    "reading_list": false,
-    "completed": false,
-    "reading": false,
-    "favorite": false,
+    reading_list: false,
+    completed: false,
+    reading: false,
+    favorite: false,
   });
   const [loading, setloading] = useState(false);
   const [error, setError] = useState(null);
 
   const { user } = useUserAuthContext();
-  //status button
   const [status, setStatus] = useState("Want to Read");
   const [isOpen, setIsOpen] = useState(false);
+  const ref = useRef(null);
+  useOnClickOutside(ref, () => setIsOpen(false));
+
   const handleStatusChange = async (
     newStatus: React.SetStateAction<string>,
     statusType: StatusEnum
@@ -51,6 +60,7 @@ export default function BookPage() {
       setloading(false);
     }
   };
+
   useEffect(() => {
     if (bookInCollection["completed"]) {
       setStatus("Read");
@@ -84,43 +94,43 @@ export default function BookPage() {
     }
   };
   const getStatusContent = () => {
-  if (bookInCollection["completed"]) {
-    return (
-      <div className="flex items-center gap-1">
-        <BookCheckIcon width={20} />
-        Read
-      </div>
-    );
-  }
-  if (bookInCollection["reading"]) {
-    return (
-      <div className="flex items-center gap-1">
-        <BookOpenTextIcon width={20} />
-        Currently Reading
-      </div>
-    );
-  }
-  if (bookInCollection["reading_list"]) {
+    if (bookInCollection["completed"]) {
+      return (
+        <div className="flex items-center gap-1">
+          <BookCheckIcon width={20} />
+          Read
+        </div>
+      );
+    }
+    if (bookInCollection["reading"]) {
+      return (
+        <div className="flex items-center gap-1">
+          <BookOpenTextIcon width={20} />
+          Currently Reading
+        </div>
+      );
+    }
+    if (bookInCollection["reading_list"]) {
+      return (
+        <div className="flex items-center gap-1">
+          <BookmarkPlusIcon width={20} />
+          Want to Read
+        </div>
+      );
+    }
     return (
       <div className="flex items-center gap-1">
         <BookmarkPlusIcon width={20} />
         Want to Read
       </div>
     );
-  }
-  return (
-    <div className="flex items-center gap-1">
-      <BookmarkPlusIcon width={20} />
-      Want to Read
-    </div>
-  );
-};
+  };
 
   //AI modal
   const [open, setOpen] = useState(false);
-  const closeModal = () => {
-    setOpen(false);
-  };
+  const aimodalRef = useRef(null);
+
+  useOnClickOutside(aimodalRef, () => setOpen(false));
 
   const toggleBookLibrary = async (status: StatusEnum, action: string) => {
     if (!user) {
@@ -128,7 +138,7 @@ export default function BookPage() {
         duration: 3000,
         position: "top-center",
       });
-      setStatus("Want to Read")
+      setStatus("Want to Read");
       return;
     }
     try {
@@ -221,20 +231,21 @@ export default function BookPage() {
     }
   };
 
-  const handleStatusRemoval = async() => {
+  const handleStatusRemoval = async () => {
     try {
-      await removeBookFromLibrary({userId: user?.uid, bookId: bookData.id})
-      setBookInCollection(prev => ({...prev, 
-        "completed": false,
-        "reading": false,
-        "reading_list": false
-      }))
-      toast.success(`${bookData.title} removed from your library`)
+      await removeBookFromLibrary({ userId: user?.uid, bookId: bookData.id });
+      setBookInCollection((prev) => ({
+        ...prev,
+        completed: false,
+        reading: false,
+        reading_list: false,
+      }));
+      toast.success(`${bookData.title} removed from your library`);
     } catch (error) {
-      console.log("Error removing status", error)
+      console.log("Error removing status", error);
       toast.error("Error removing book from library");
     }
-  }
+  };
   //check if the book is in the user's library
   useEffect(() => {
     const checkBookExistence = async () => {
@@ -276,44 +287,121 @@ export default function BookPage() {
     initialData: [],
   });
 
+  const variants = {
+    initial: { y: -50, opacity: 0 },
+    fadeIn: { y: 0, opacity: 1 },
+  };
+
   return (
     <div className="bg-light-background dark:bg-dark-background h-screen">
       <Nav />
       <div className="md:hidden">
-        <h2 className="text-center font-Rubik_Dirt text-3xl mt-5 z-10">
+        <motion.h2
+          variants={variants}
+          initial="initial"
+          animate="fadeIn"
+          className="text-center font-Rubik_Dirt text-3xl mt-5 z-10"
+        >
           {title}
-        </h2>
+        </motion.h2>
       </div>
       <div className="flex flex-col-reverse items-center mt-4 px-1 md:px-[10%] md:flex-row md:justify-between md:items-start md:gap-3 md:mt-5">
         <div className="md:w-[70vw] p-2 rounded-md dark:text-dark-text text-light-text">
           <div className="hidden md:block">
-            <h2 className="font-Rubik_Dirt text-3xl z-10">{title}</h2>
+            <motion.h2
+              variants={variants}
+              initial="initial"
+              animate="fadeIn"
+              className="font-Rubik_Dirt text-3xl z-10"
+            >
+              {title}
+            </motion.h2>
           </div>
-          <button
+          <motion.button
             className="bg-gradient-to-tr from-blue-800 via-amber-500 to-stone-900 text-light-text my-4 rounded-full px-4 text-sm flex items-center gap-2 py-1"
             onClick={() => setOpen(true)}
+            variants={variants}
+            initial="initial"
+            animate="fadeIn"
+            transition={{
+              delay: 0.2,
+            }}
+            whileHover={{
+              scale: 1.06,
+            }}
           >
-            <Bot size={16} className="animate-pulse"/>
+            <Bot size={16} className="animate-pulse" />
             Ask AI
-          </button>
-          <p className="text-lg font-Tilt_Neon md:my-2">Description:</p>
-          <p className="text-sm leading-relaxed">{bookData.description}</p>
-          <p className="font-Oxanium text-sm mt-4">
+          </motion.button>
+          <motion.p
+            variants={variants}
+            initial="initial"
+            animate="fadeIn"
+            transition={{
+              delay: 0.3,
+            }}
+            className="text-lg font-Tilt_Neon md:my-2"
+          >
+            Description:
+          </motion.p>
+          <motion.p
+            variants={variants}
+            initial="initial"
+            animate="fadeIn"
+            transition={{
+              delay: 0.4,
+            }}
+            className="text-sm leading-relaxed"
+          >
+            {bookData.description}
+          </motion.p>
+          <motion.p
+            variants={variants}
+            initial="initial"
+            animate="fadeIn"
+            transition={{
+              delay: 0.5,
+            }}
+            className="font-Oxanium text-sm mt-4"
+          >
             Author(s):{" "}
             {bookData.authors?.map((a) => (
               <span>{a}</span>
             ))}
-          </p>
-          <p className="font-Oxanium text-sm">
+          </motion.p>
+          <motion.p
+            variants={variants}
+            initial="initial"
+            animate="fadeIn"
+            transition={{
+              delay: 0.6,
+            }}
+            className="font-Oxanium text-sm"
+          >
             Publisher: {bookData?.publisher}
-          </p>
-          <p className="font-Oxanium text-sm">
+          </motion.p>
+          <motion.p
+            variants={variants}
+            initial="initial"
+            animate="fadeIn"
+            transition={{
+              delay: 0.6,
+            }}
+            className="font-Oxanium text-sm"
+          >
             Genre(s):{" "}
             {bookData.categories?.map((g) => (
               <span key={g}>{g}</span>
             ))}
-          </p>
-          <div>
+          </motion.p>
+          <motion.div
+            variants={variants}
+            initial="initial"
+            animate="fadeIn"
+            transition={{
+              delay: 0.7,
+            }}
+          >
             <p className="my-2 font-Tilt_Neon text-lg">Download links</p>
             {isLoading ? (
               <div className="w-[100%] h-20 flex justify-center items-center">
@@ -379,20 +467,34 @@ export default function BookPage() {
                 </div>
               </div>
             )}
-          </div>
+          </motion.div>
         </div>
-        <div className="mb-2 grid grid-cols-2 gap-2 md:flex md:flex-col">
-          <img
+        <div
+          className="mb-2 grid grid-cols-2 gap-2 md:flex md:flex-col"
+          ref={ref}
+        >
+          <motion.img
+            layoutId={`book-img-${bookData.id}`}
             src={bookData.imageLinks?.thumbnail}
             alt={bookData.title}
             className="md:w-[350px]"
           />
           <div className="">
             <div className="relative inline-block text-left w-full">
-              <button
+              <motion.button
                 type="button"
                 className={`inline-flex w-full justify-center gap-x-2 items-center rounded-md bg-gray-700 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-gray-600 ${getButtonStyles()}`}
                 onClick={() => setIsOpen(!isOpen)}
+                variants={variants}
+                initial="initial"
+                animate="fadeIn"
+                transition={{
+                  delay: 0.3,
+                }}
+                whileTap={{ scale: 0.9 }}
+                whileHover={{
+                  scale: 1.04,
+                }}
               >
                 {getStatusContent()}
                 <svg
@@ -407,62 +509,84 @@ export default function BookPage() {
                     clipRule="evenodd"
                   />
                 </svg>
-              </button>
-
-              {isOpen && (
-                <div className="absolute z-10 mt-2 w-44 md:w-48 origin-top-right rounded-md bg-gray-800 shadow-lg ring-1 ring-black ring-opacity-5">
-                  <div
-                    className="py-1"
-                    role="menu"
-                    aria-orientation="vertical"
-                    aria-labelledby="options-menu"
+              </motion.button>
+              <AnimatePresence mode="popLayout">
+                {isOpen && (
+                  <motion.div
+                    variants={variants}
+                    initial={{ y: -16, opacity: 0 }}
+                    animate="fadeIn"
+                    exit={{ y: -16, opacity: 0 }}
+                    className="absolute z-10 mt-2 w-44 md:w-48 origin-top-right rounded-md bg-gray-800 shadow-lg ring-1 ring-black ring-opacity-5"
                   >
-                    <button
-                      onClick={() =>
-                        handleStatusChange("Want to Read", "reading_list")
-                      }
-                      className="px-4 py-2 text-sm text-gray-200 hover:bg-gray-700 hover:text-white w-full text-left flex items-center gap-2"
+                    <div
+                      className="py-1"
+                      role="menu"
+                      aria-orientation="vertical"
+                      aria-labelledby="options-menu"
                     >
-                      <BookmarkPlusIcon width={20} />
-                      Want to Read
-                    </button>
-                    <button
-                      onClick={() =>
-                        handleStatusChange("Currently Reading", "reading")
-                      }
-                      className="flex gap-2 px-4 py-2 text-sm text-gray-200 hover:bg-gray-700 hover:text-white w-full text-left"
-                    >
-                      <BookOpenTextIcon width={20} />
-                      Currently Reading
-                    </button>
-                    <button
-                      onClick={() => handleStatusChange("Read", "completed")}
-                      className="flex gap-2 items-center px-4 py-2 text-sm text-gray-200 hover:bg-gray-700 hover:text-white w-full text-left"
-                    >
-                      <BookCheckIcon width={20} />
-                      Read
-                    </button>
-                    {hasStatus() && (
-                      <div>
-                        <div className="border-t border-gray-600 my-1"></div>
-                        <button
-                          onClick={handleStatusRemoval}
-                          className="block px-4 py-2 text-sm text-red-400 hover:bg-gray-700 hover:text-red-300 w-full text-left"
-                        >
-                          Remove from Library
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
+                      <motion.button
+                        whileTap={{ scale: 0.95 }}
+                        onClick={() =>
+                          handleStatusChange("Want to Read", "reading_list")
+                        }
+                        className="px-4 py-2 text-sm text-gray-200 hover:bg-gray-700 hover:text-white w-full text-left flex items-center gap-2"
+                      >
+                        <BookmarkPlusIcon width={20} />
+                        Want to Read
+                      </motion.button>
+                      <motion.button
+                        whileTap={{ scale: 0.95 }}
+                        onClick={() =>
+                          handleStatusChange("Currently Reading", "reading")
+                        }
+                        className="flex gap-2 px-4 py-2 text-sm text-gray-200 hover:bg-gray-700 hover:text-white w-full text-left"
+                      >
+                        <BookOpenTextIcon width={20} />
+                        Currently Reading
+                      </motion.button>
+                      <motion.button
+                        whileTap={{ scale: 0.95 }}
+                        onClick={() => handleStatusChange("Read", "completed")}
+                        className="flex gap-2 items-center px-4 py-2 text-sm text-gray-200 hover:bg-gray-700 hover:text-white w-full text-left"
+                      >
+                        <BookCheckIcon width={20} />
+                        Read
+                      </motion.button>
+                      {hasStatus() && (
+                        <div>
+                          <div className="border-t border-gray-600 my-1"></div>
+                          <button
+                            onClick={handleStatusRemoval}
+                            className="block px-4 py-2 text-sm text-red-400 hover:bg-gray-700 hover:text-red-300 w-full text-left"
+                          >
+                            Remove from Library
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
-            <div
+            <motion.div
               className="mt-3 cursor-pointer dark:text-dark-text"
               onClick={() => handleFavorite(user?.uid, bookData.id)}
+              variants={variants}
+              initial="initial"
+              animate="fadeIn"
+              transition={{
+                delay: 0.4,
+              }}
             >
               {bookInCollection["favorite"] ? (
-                <button className="flex items-center border-2 border-amber-500 p-1 w-full rounded-md justify-evenly md:p-2">
+                <motion.button
+                  whileTap={{ scale: 0.95 }}
+                  className="flex items-center border-2 border-amber-500 p-1 w-full rounded-md justify-evenly md:p-2"
+                  whileHover={{
+                    scale: 1.04,
+                  }}
+                >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill="#ffc107"
@@ -478,9 +602,15 @@ export default function BookPage() {
                     />
                   </svg>
                   <p>Remove Favorites</p>
-                </button>
+                </motion.button>
               ) : (
-                <button className="flex items-center border-2 border-amber-500 p-1 w-full rounded-md justify-evenly md:p-2">
+                <motion.button
+                  whileTap={{ scale: 0.95 }}
+                  className="flex items-center border-2 border-amber-500 p-1 w-full rounded-md justify-evenly md:p-2"
+                  whileHover={{
+                    scale: 1.04,
+                  }}
+                >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill="white"
@@ -496,41 +626,38 @@ export default function BookPage() {
                     />
                   </svg>
                   <p>Add Favorites</p>
-                </button>
+                </motion.button>
               )}
-            </div>
+            </motion.div>
           </div>
         </div>
       </div>
-      <Modal
-        isOpen={open}
-        onRequestClose={closeModal}
-        contentLabel="Chat About Stuff"
-        ariaHideApp={false}
-        shouldCloseOnOverlayClick={true}
-        style={{
-          overlay: {
-            backgroundColor: "#4e4b4bf4",
-          },
-          content: {
-            display: "flex",
-            flexDirection: "column",
-            top: "50%",
-            left: "50%",
-            right: "auto",
-            bottom: "auto",
-            marginRight: "-50%",
-            transform: "translate(-50%, -50%)",
-            height: "80%",
-            width: "92%",
-            margin: "auto",
-            border: "none",
-            padding: "0",
-          },
-        }}
-      >
-        <BookChat title={bookData.title} author={bookData.authors[0]} />
-      </Modal>
+      <AnimatePresence mode="wait">
+        {open ? (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-[rgba(0,0,0,0.7)] flex justify-center items-center z-50"
+          >
+            <div
+              ref={aimodalRef}
+              className="h-[80%] min-w-[90%] relative md:min-w-[70%]"
+            >
+              <motion.div
+                variants={variants}
+                initial={{ y: "-100%", opacity: 0 }}
+                animate="fadeIn"
+                exit={{ y: "100%", opacity: 0 }}
+                transition={{ bounce: 0 }}
+                className="absolute inset-0 rounded-lg"
+              >
+                <BookChat title={bookData.title} author={bookData.authors[0]} />
+              </motion.div>
+            </div>
+          </motion.div>
+        ) : null}
+      </AnimatePresence>
     </div>
   );
 }

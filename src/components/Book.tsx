@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { GoogleBook } from "../types";
 import { Link } from "react-router-dom";
 import { useOnClickOutside } from "usehooks-ts";
-import { motion, scale } from "framer-motion";
+import { motion } from "framer-motion";
 
 export default function Book({
   id,
@@ -95,13 +95,13 @@ export default function Book({
                       <p key={author}>{author},</p>
                     ))}
                   </p>
-                  <motion.p initial={{scale: 0.6}} animate={{scale: 1}} exit={{scale: 0.6}} className="font-sans text-sm">
+                  <motion.p layoutId={`book-desc-${id}`} initial={{scale: 0.6}} animate={{scale: 1}} exit={{scale: 0.6}} className="font-sans text-sm">
                     {truncateTitle(description, 200)}
                   </motion.p>
                 </div>
               </div>
             </div>
-            <motion.div initial={{scale: 0.6}} animate={{scale: 1}} exit={{scale: 0.6}} className="w-full mt-4">
+            <motion.div initial={{scale: 0.6}} animate={{scale: 1}} exit={{scale: 0.6}} whileTap={{ scale: 0.95 }} className="w-full mt-4">
               <Link
                 to={`/book/${title}`}
                 state={{

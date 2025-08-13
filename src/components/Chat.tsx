@@ -1,29 +1,31 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { Send, MessageCircle, AlertCircle, Loader2 } from 'lucide-react';
-import { chatAboutBook } from '../services/requests';
+import React, { useState, useRef, useEffect } from "react";
+import { Send, MessageCircle, AlertCircle, Loader2 } from "lucide-react";
+import { chatAboutBook } from "../services/requests";
+import { motion } from "framer-motion";
 
 interface Message {
   id: string;
-  type: 'user' | 'assistant';
+  type: "user" | "assistant";
   content: string;
   isStreaming?: boolean;
   timestamp: Date;
 }
 
-
-const BookChat = ({title, author} : {title: string; author: string}) => {
+const BookChat = ({ title, author }: { title: string; author: string }) => {
   const [messages, setMessages] = useState<Message[]>([]);
-  const [currentMessage, setCurrentMessage] = useState('');
+  const [currentMessage, setCurrentMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [sessionId] = useState(() => crypto.randomUUID());
-  const [streamingMessageId, setStreamingMessageId] = useState<string | null>(null);
-  
+  const [streamingMessageId, setStreamingMessageId] = useState<string | null>(
+    null
+  );
+
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
   const handleSendMessage = async () => {
@@ -31,22 +33,22 @@ const BookChat = ({title, author} : {title: string; author: string}) => {
 
     const userMessage: Message = {
       id: crypto.randomUUID(),
-      type: 'user',
+      type: "user",
       content: currentMessage.trim(),
-      timestamp: new Date()
+      timestamp: new Date(),
     };
 
     const assistantMessageId = crypto.randomUUID();
     const assistantMessage: Message = {
       id: assistantMessageId,
-      type: 'assistant',
-      content: '',
+      type: "assistant",
+      content: "",
       isStreaming: true,
-      timestamp: new Date()
+      timestamp: new Date(),
     };
 
-    setMessages(prev => [...prev, userMessage, assistantMessage]);
-    setCurrentMessage('');
+    setMessages((prev) => [...prev, userMessage, assistantMessage]);
+    setCurrentMessage("");
     setIsLoading(true);
     setError(null);
     setStreamingMessageId(assistantMessageId);
@@ -58,18 +60,22 @@ const BookChat = ({title, author} : {title: string; author: string}) => {
         message: userMessage.content,
         sessionId,
         onChunk: (text: string, sessionId: string) => {
-          setMessages(prev => prev.map(msg => 
-            msg.id === assistantMessageId 
-              ? { ...msg, content: msg.content + text }
-              : msg
-          ));
+          setMessages((prev) =>
+            prev.map((msg) =>
+              msg.id === assistantMessageId
+                ? { ...msg, content: msg.content + text }
+                : msg
+            )
+          );
         },
         onComplete: () => {
-          setMessages(prev => prev.map(msg => 
-            msg.id === assistantMessageId 
-              ? { ...msg, isStreaming: false }
-              : msg
-          ));
+          setMessages((prev) =>
+            prev.map((msg) =>
+              msg.id === assistantMessageId
+                ? { ...msg, isStreaming: false }
+                : msg
+            )
+          );
           setIsLoading(false);
           setStreamingMessageId(null);
         },
@@ -78,26 +84,30 @@ const BookChat = ({title, author} : {title: string; author: string}) => {
           setIsLoading(false);
           setStreamingMessageId(null);
           // Remove the failed message
-          setMessages(prev => prev.filter(msg => msg.id !== assistantMessageId));
-        }
+          setMessages((prev) =>
+            prev.filter((msg) => msg.id !== assistantMessageId)
+          );
+        },
       });
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to send message');
+      setError(err instanceof Error ? err.message : "Failed to send message");
       setIsLoading(false);
       setStreamingMessageId(null);
-      setMessages(prev => prev.filter(msg => msg.id !== assistantMessageId));
+      setMessages((prev) =>
+        prev.filter((msg) => msg.id !== assistantMessageId)
+      );
     }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
+    if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSendMessage();
     }
   };
 
   return (
-    <div className="min-h-full bg-light-background dark:bg-dark-background flex flex-col">
+    <div className="h-full bg-light-background dark:bg-dark-background flex flex-col">
       <header className="bg-light-background border-b border-gray-200 px-1 md:px-4 py-4 dark:bg-dark-background">
         <div className="max-w-4xl mx-auto flex items-center justify-between">
           <div className="flex items-center space-x-3">
@@ -105,7 +115,9 @@ const BookChat = ({title, author} : {title: string; author: string}) => {
               <MessageCircle className="w-5 h-5 text-light-secondary dark:text-dark-background" />
             </div>
             <div>
-              <h1 className="font-semibold text-gray-900 dark:text-dark-text">{title}</h1>
+              <h1 className="font-semibold text-gray-900 dark:text-dark-text">
+                {title}
+              </h1>
               <p className="text-sm text-gray-600">by {author}</p>
             </div>
           </div>
@@ -118,23 +130,32 @@ const BookChat = ({title, author} : {title: string; author: string}) => {
           {messages.map((message) => (
             <div
               key={message.id}
-              className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}
+              className={`flex ${
+                message.type === "user" ? "justify-end" : "justify-start"
+              }`}
             >
-              <div
+              <motion.div
                 className={`max-w-3xl rounded-2xl px-4 py-3 ${
-                  message.type === 'user'
-                    ? 'bg-light-primary dark:bg-dark-primary text-white'
-                    : 'bg-white border border-gray-200 text-gray-900'
+                  message.type === "user"
+                    ? "bg-light-primary dark:bg-dark-primary text-white"
+                    : "bg-white border border-gray-200 text-gray-900"
                 }`}
+                initial={{ y: 50, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
               >
                 <p className="whitespace-pre-wrap">{message.content}</p>
                 {message.isStreaming && (
-                  <div className="flex items-center mt-1 text-light-text">
+                  <motion.div
+                    className="flex items-center mt-1 text-light-text"
+                    initial={{ y: 50, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ delay: 0.5 }}
+                  >
                     <Loader2 className="w-4 h-4 animate-spin mr-2" />
                     <span className="text-sm">Thinking...</span>
-                  </div>
+                  </motion.div>
                 )}
-              </div>
+              </motion.div>
             </div>
           ))}
           <div ref={messagesEndRef} />
