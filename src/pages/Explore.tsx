@@ -134,9 +134,9 @@ export default function Explore() {
             <AnimatePresence mode="popLayout">
               <motion.div
                 key={activeTab}
-                initial={{ opacity: 0, scale: 0.6 }}
+                initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.6 }}
+                exit={{ opacity: 0, scale: 0.9 }}
                 transition={{
                   type:"spring",
                   duration: 0.3

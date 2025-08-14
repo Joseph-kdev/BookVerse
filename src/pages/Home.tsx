@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import Footer from "../components/Footer";
 import { addUser } from "../services/requests";
 import { auth } from "../config/firebase-config";
+import { motion } from "framer-motion";
 
 export default function Home() {
   const { user } = useUserAuthContext();
@@ -29,36 +30,42 @@ export default function Home() {
       description:
         "Create personalized reading lists to organize your 'to-read', 'currently reading', and 'finished' books with ease.",
       icon: BookMarked,
+      image: "smart.png"
     },
     {
       title: "Favorites at Your Fingertips",
       description:
         "Instantly access your favorite books and build a collection that reflects your literary taste.",
       icon: Heart,
+      image: "fav.png"
     },
     {
       title: "Genre-Based Discovery",
       description:
         "Browse books by genre and uncover new reads tailored to your mood or interests.",
       icon: Layers,
+      image: "genre.png"
     },
     {
       title: "Powerful Book Search",
       description:
         "Search by title, author, or keywords and get quick, accurate results from a rich dataset.",
       icon: Search,
+      image: "find.png"
     },
     {
       title: "Download & Access Easily",
       description:
         "Get free download links for books—no more hunting across sketchy sites.",
       icon: Download,
+      image: "download.png"
     },
     {
       title: "Built-in Book Assistant",
       description:
         "Each book page features an AI chatbot that offers summaries, insights, and recommendations tailored to that title.",
       icon: Bot,
+      image: "bot.png"
     },
   ];
 
@@ -132,20 +139,22 @@ export default function Home() {
               <div className="flex flex-col sm:flex-row gap-4">
                 <button className="animate-fadeInDelayLong bg-light-accent p-4 rounded-md flex items-center w-40">
                   <Link to={user ? "/explore" : "/login"}>Get Started</Link>
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="#ffc107"
-                    viewBox="0 0 24 24"
-                    strokeWidth={1.5}
-                    stroke="currentColor"
-                    className="ml-2 h-5 w-5"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="m8.25 4.5 7.5 7.5-7.5 7.5"
-                    />
-                  </svg>
+                  <div>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="#ffc107"
+                      viewBox="0 0 24 24"
+                      strokeWidth={1.5}
+                      stroke="currentColor"
+                      className="ml-2 h-5 w-5"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="m8.25 4.5 7.5 7.5-7.5 7.5"
+                      />
+                    </svg>
+                  </div>
                 </button>
                 {/* <button className="text-white border-white border-2 p-2 rounded-md hover:bg-white/10 animate-fadeInDelayLonger flex items-center">
                   <span>Learn More</span>
@@ -203,6 +212,7 @@ export default function Home() {
                 title={feature.title}
                 description={feature.description}
                 icon={feature.icon}
+                image={feature.image}
               />
             ))}
           </div>
