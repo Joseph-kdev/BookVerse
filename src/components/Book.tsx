@@ -95,13 +95,13 @@ export default function Book({
                       <p key={author}>{author},</p>
                     ))}
                   </p>
-                  <motion.p layoutId={`book-desc-${id}`} initial={{scale: 0.6}} animate={{scale: 1}} exit={{scale: 0.6}} className="font-sans text-sm">
+                  <motion.p layoutId={`book-desc-${id}`} initial={{opacity: 0, filter:'blur(4px)'}} animate={{opacity: 1, filter:'blur(0px)'}} exit={{opacity: 0, filter:'blur(4px)'}} className="font-sans text-sm">
                     {truncateTitle(description, 200)}
                   </motion.p>
                 </div>
               </div>
             </div>
-            <motion.div initial={{scale: 0.6}} animate={{scale: 1}} exit={{scale: 0.6}} whileTap={{ scale: 0.95 }} className="w-full mt-4">
+            <motion.div initial={{scale: 0.9}} animate={{scale: 1}} exit={{scale: 0.9}} whileTap={{ scale: 0.95 }} className="w-full mt-4">
               <Link
                 to={`/book/${title}`}
                 state={{
