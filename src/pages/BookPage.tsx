@@ -23,7 +23,13 @@ import {
 import BookChat from "../components/Chat";
 import { ClockLoader } from "react-spinners";
 import toast from "react-hot-toast";
-import { AnimatePresence, motion, MotionConfig, stagger } from "framer-motion";
+import {
+  AnimatePresence,
+  motion,
+  MotionConfig,
+  stagger,
+  transform,
+} from "framer-motion";
 import { useOnClickOutside } from "usehooks-ts";
 
 export default function BookPage() {
@@ -165,7 +171,7 @@ export default function BookPage() {
           icon: "✅",
           className: "text-sm text-light-text",
         });
-        console.log(`${bookData.title} added to ${status}`);
+
         return;
       } else if (action === "remove") {
         await removeBookFromLibrary({
@@ -180,10 +186,8 @@ export default function BookPage() {
           icon: "❌",
           className: "text-sm text-light-text",
         });
-        console.log(`${bookData.title} removed from ${status}`);
       }
     } catch (error) {
-      console.log("Error adding book", error);
       toast.error("Error adding book");
     }
   };
@@ -226,7 +230,6 @@ export default function BookPage() {
         });
       }
     } catch (error) {
-      console.log("Error adding book", error);
       toast.error("Error adding book");
     }
   };
@@ -242,7 +245,6 @@ export default function BookPage() {
       }));
       toast.success(`${bookData.title} removed from your library`);
     } catch (error) {
-      console.log("Error removing status", error);
       toast.error("Error removing book from library");
     }
   };
@@ -258,7 +260,7 @@ export default function BookPage() {
       if (bookQuery.length == 0) {
         return;
       }
-      console.log("bookquery", bookQuery);
+
       setBookInCollection((prev) => ({ ...prev, [bookQuery[0].status]: true }));
     };
     const checkBookFavorite = async () => {
@@ -288,25 +290,25 @@ export default function BookPage() {
   });
 
   const variants = {
-    initial: { y: 10, opacity: 0, filter:'blur(4px)' },
-    fadeIn: { y: 0, opacity: 1, filter:'blur(0px)' },
+    initial: { transform: "translateY(10px)", opacity: 0, filter: "blur(4px)" },
+    fadeIn: { transform: "translateY(0px)", opacity: 1, filter: "blur(0px)" },
   };
 
   return (
-      <div className="bg-light-background dark:bg-dark-background h-screen">
-        <Nav />
-        <div className="md:hidden">
-          <motion.h2
-            variants={variants}
-            initial="initial"
-            animate="fadeIn"
-            className="text-center font-Rubik_Dirt text-3xl mt-5 z-10"
-          >
-            {title}
-          </motion.h2>
-        </div>
-        <div className="flex flex-col-reverse items-center mt-4 px-1 md:px-[10%] md:flex-row md:justify-between md:items-start md:gap-3 md:mt-5">
-          <MotionConfig transition={{ type:"spring", bounce: 0}}>
+    <div className="bg-light-background dark:bg-dark-background h-screen">
+      <Nav />
+      <div className="md:hidden">
+        <motion.h2
+          variants={variants}
+          initial="initial"
+          animate="fadeIn"
+          className="text-center font-Rubik_Dirt text-3xl mt-5 z-10"
+        >
+          {title}
+        </motion.h2>
+      </div>
+      <div className="flex flex-col-reverse items-center mt-4 px-1 md:px-[10%] md:flex-row md:justify-between md:items-start md:gap-3 md:mt-5">
+        <MotionConfig transition={{ type: "spring", bounce: 0 }}>
           <div className="md:w-[70vw] p-2 rounded-md dark:text-dark-text text-light-text">
             <div className="hidden md:block">
               <motion.h2
@@ -470,196 +472,196 @@ export default function BookPage() {
               )}
             </motion.div>
           </div>
-          </MotionConfig>
-          <div
-            className="mb-2 grid grid-cols-2 gap-2 md:flex md:flex-col"
-            ref={ref}
-          >
-            <motion.img
-              layoutId={`book-img-${bookData.id}`}
-              src={bookData.imageLinks?.thumbnail}
-              alt={bookData.title}
-              className="md:w-[350px]"
-            />
-            <div className="">
-              <div className="relative inline-block text-left w-full">
-                <motion.button
-                  type="button"
-                  className={`inline-flex w-full justify-center gap-x-2 items-center rounded-md bg-gray-700 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-gray-600 ${getButtonStyles()}`}
-                  onClick={() => setIsOpen(!isOpen)}
-                  variants={variants}
-                  initial="initial"
-                  animate="fadeIn"
-                  transition={{
-                    delay: 0.3,
-                  }}
-                  whileTap={{ scale: 0.9 }}
-                  whileHover={{
-                    scale: 1.04,
-                  }}
-                >
-                  {getStatusContent()}
-                  <svg
-                    className="-mr-1 h-5 w-5 text-gray-400"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                    aria-hidden="true"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                </motion.button>
-                <AnimatePresence mode="popLayout">
-                  {isOpen && (
-                    <motion.div
-                      variants={variants}
-                      initial={{ y: -16, opacity: 0 }}
-                      animate="fadeIn"
-                      exit={{ y: -16, opacity: 0 }}
-                      className="absolute z-10 mt-2 w-44 md:w-48 origin-top-right rounded-md bg-gray-800 shadow-lg ring-1 ring-black ring-opacity-5"
-                    >
-                      <div
-                        className="py-1"
-                        role="menu"
-                        aria-orientation="vertical"
-                        aria-labelledby="options-menu"
-                      >
-                        <motion.button
-                          whileTap={{ scale: 0.95 }}
-                          onClick={() =>
-                            handleStatusChange("Want to Read", "reading_list")
-                          }
-                          className="px-4 py-2 text-sm text-gray-200 hover:bg-gray-700 hover:text-white w-full text-left flex items-center gap-2"
-                        >
-                          <BookmarkPlusIcon width={20} />
-                          Want to Read
-                        </motion.button>
-                        <motion.button
-                          whileTap={{ scale: 0.95 }}
-                          onClick={() =>
-                            handleStatusChange("Currently Reading", "reading")
-                          }
-                          className="flex gap-2 px-4 py-2 text-sm text-gray-200 hover:bg-gray-700 hover:text-white w-full text-left"
-                        >
-                          <BookOpenTextIcon width={20} />
-                          Currently Reading
-                        </motion.button>
-                        <motion.button
-                          whileTap={{ scale: 0.95 }}
-                          onClick={() => handleStatusChange("Read", "completed")}
-                          className="flex gap-2 items-center px-4 py-2 text-sm text-gray-200 hover:bg-gray-700 hover:text-white w-full text-left"
-                        >
-                          <BookCheckIcon width={20} />
-                          Read
-                        </motion.button>
-                        {hasStatus() && (
-                          <div>
-                            <div className="border-t border-gray-600 my-1"></div>
-                            <button
-                              onClick={handleStatusRemoval}
-                              className="block px-4 py-2 text-sm text-red-400 hover:bg-gray-700 hover:text-red-300 w-full text-left"
-                            >
-                              Remove from Library
-                            </button>
-                          </div>
-                        )}
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-              <motion.div
-                className="mt-3 cursor-pointer dark:text-dark-text"
-                onClick={() => handleFavorite(user?.uid, bookData.id)}
+        </MotionConfig>
+        <div
+          className="mb-2 grid grid-cols-2 gap-2 md:flex md:flex-col"
+          ref={ref}
+        >
+          <motion.img
+            layoutId={`book-img-${bookData.id}`}
+            src={bookData.imageLinks?.thumbnail}
+            alt={bookData.title}
+            className="md:w-[350px]"
+          />
+          <div className="">
+            <div className="relative inline-block text-left w-full">
+              <motion.button
+                type="button"
+                className={`inline-flex w-full justify-center gap-x-2 items-center rounded-md bg-gray-700 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-gray-600 ${getButtonStyles()}`}
+                onClick={() => setIsOpen(!isOpen)}
                 variants={variants}
                 initial="initial"
                 animate="fadeIn"
                 transition={{
-                  delay: 0.4,
+                  delay: 0.3,
+                }}
+                whileTap={{ scale: 0.9 }}
+                whileHover={{
+                  scale: 1.04,
                 }}
               >
-                {bookInCollection["favorite"] ? (
-                  <motion.button
-                    whileTap={{ scale: 0.95 }}
-                    className="flex items-center border-2 border-amber-500 p-1 w-full rounded-md justify-evenly md:p-2"
-                    whileHover={{
-                      scale: 1.04,
-                    }}
+                {getStatusContent()}
+                <svg
+                  className="-mr-1 h-5 w-5 text-gray-400"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                  aria-hidden="true"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              </motion.button>
+              <AnimatePresence mode="popLayout">
+                {isOpen && (
+                  <motion.div
+                    variants={variants}
+                    initial={{ transform: "translateY(-16px)", opacity: 0 }}
+                    animate="fadeIn"
+                    exit={{ transform: "translateY(-16px)", opacity: 0 }}
+                    className="absolute z-10 mt-2 w-44 md:w-48 origin-top-right rounded-md bg-gray-800 shadow-lg ring-1 ring-black ring-opacity-5"
                   >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="#ffc107"
-                      viewBox="0 0 24 24"
-                      strokeWidth={1.5}
-                      stroke="white"
-                      className="size-4"
+                    <div
+                      className="py-1"
+                      role="menu"
+                      aria-orientation="vertical"
+                      aria-labelledby="options-menu"
                     >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"
-                      />
-                    </svg>
-                    <p>Remove Favorites</p>
-                  </motion.button>
-                ) : (
-                  <motion.button
-                    whileTap={{ scale: 0.95 }}
-                    className="flex items-center border-2 border-amber-500 p-1 w-full rounded-md justify-evenly md:p-2"
-                    whileHover={{
-                      scale: 1.04,
-                    }}
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="white"
-                      viewBox="0 0 24 24"
-                      strokeWidth={1.5}
-                      stroke="currentColor"
-                      className="size-4"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"
-                      />
-                    </svg>
-                    <p>Add Favorites</p>
-                  </motion.button>
+                      <motion.button
+                        whileTap={{ scale: 0.95 }}
+                        onClick={() =>
+                          handleStatusChange("Want to Read", "reading_list")
+                        }
+                        className="px-4 py-2 text-sm text-gray-200 hover:bg-gray-700 hover:text-white w-full text-left flex items-center gap-2"
+                      >
+                        <BookmarkPlusIcon width={20} />
+                        Want to Read
+                      </motion.button>
+                      <motion.button
+                        whileTap={{ scale: 0.95 }}
+                        onClick={() =>
+                          handleStatusChange("Currently Reading", "reading")
+                        }
+                        className="flex gap-2 px-4 py-2 text-sm text-gray-200 hover:bg-gray-700 hover:text-white w-full text-left"
+                      >
+                        <BookOpenTextIcon width={20} />
+                        Currently Reading
+                      </motion.button>
+                      <motion.button
+                        whileTap={{ scale: 0.95 }}
+                        onClick={() => handleStatusChange("Read", "completed")}
+                        className="flex gap-2 items-center px-4 py-2 text-sm text-gray-200 hover:bg-gray-700 hover:text-white w-full text-left"
+                      >
+                        <BookCheckIcon width={20} />
+                        Read
+                      </motion.button>
+                      {hasStatus() && (
+                        <div>
+                          <div className="border-t border-gray-600 my-1"></div>
+                          <button
+                            onClick={handleStatusRemoval}
+                            className="block px-4 py-2 text-sm text-red-400 hover:bg-gray-700 hover:text-red-300 w-full text-left"
+                          >
+                            Remove from Library
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </motion.div>
                 )}
-              </motion.div>
+              </AnimatePresence>
             </div>
+            <motion.div
+              className="mt-3 cursor-pointer dark:text-dark-text"
+              onClick={() => handleFavorite(user?.uid, bookData.id)}
+              variants={variants}
+              initial="initial"
+              animate="fadeIn"
+              transition={{
+                delay: 0.4,
+              }}
+            >
+              {bookInCollection["favorite"] ? (
+                <motion.button
+                  whileTap={{ scale: 0.95 }}
+                  className="flex items-center border-2 border-amber-500 p-1 w-full rounded-md justify-evenly md:p-2"
+                  whileHover={{
+                    scale: 1.04,
+                  }}
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="#ffc107"
+                    viewBox="0 0 24 24"
+                    strokeWidth={1.5}
+                    stroke="white"
+                    className="size-4"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"
+                    />
+                  </svg>
+                  <p>Remove Favorites</p>
+                </motion.button>
+              ) : (
+                <motion.button
+                  whileTap={{ scale: 0.95 }}
+                  className="flex items-center border-2 border-amber-500 p-1 w-full rounded-md justify-evenly md:p-2"
+                  whileHover={{
+                    scale: 1.04,
+                  }}
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="white"
+                    viewBox="0 0 24 24"
+                    strokeWidth={1.5}
+                    stroke="currentColor"
+                    className="size-4"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"
+                    />
+                  </svg>
+                  <p>Add Favorites</p>
+                </motion.button>
+              )}
+            </motion.div>
           </div>
         </div>
-        <AnimatePresence mode="wait">
-          {open ? (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-[rgba(0,0,0,0.7)] flex justify-center items-center z-50"
-            >
-              <div
-                ref={aimodalRef}
-                className="h-[80%] min-w-[90%] relative md:min-w-[70%]"
-              >
-                <motion.div
-                  variants={variants}
-                  initial={{ y: "-100%", opacity: 0 }}
-                  animate="fadeIn"
-                  exit={{ y: "100%", opacity: 0 }}
-                  transition={{ bounce: 0 }}
-                  className="absolute inset-0 rounded-lg"
-                >
-                  <BookChat title={bookData.title} author={bookData.authors[0]} />
-                </motion.div>
-              </div>
-            </motion.div>
-          ) : null}
-        </AnimatePresence>
       </div>
+      <AnimatePresence mode="wait">
+        {open ? (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-[rgba(0,0,0,0.7)] flex justify-center items-center z-50"
+          >
+            <div
+              ref={aimodalRef}
+              className="h-[80%] min-w-[90%] relative md:min-w-[70%]"
+            >
+              <motion.div
+                variants={variants}
+                initial={{ transform: "translateY(-100%)", opacity: 0 }}
+                animate="fadeIn"
+                exit={{ transform: "translateY(100%)", opacity: 0 }}
+                transition={{ bounce: 0 }}
+                className="absolute inset-0 rounded-lg"
+              >
+                <BookChat title={bookData.title} author={bookData.authors[0]} />
+              </motion.div>
+            </div>
+          </motion.div>
+        ) : null}
+      </AnimatePresence>
+    </div>
   );
 }
