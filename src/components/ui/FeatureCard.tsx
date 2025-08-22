@@ -15,8 +15,8 @@ const FeatureCard: React.FC<FeatureCardProps> = ({
   image,
 }) => {
   return (
-    <div className="bg-white p-6 rounded-xl shadow-md hover:shadow-[#000000] transition-shadow duration-300 flex flex-col items-start overflow-hidden md:h-[60vh]">
-      <div className="p-3 rounded-lg mb-4 h-[220px] md:h-auto overflow-hidden relative">
+    <div className="bg-white p-6 rounded-xl shadow-md hover:shadow-[#000000] transition-shadow duration-300 flex flex-col items-start overflow-hidden">
+      <div className="p-3 rounded-lg mb-4 h-[220px] overflow-hidden relative">
         <motion.img whileHover={{ y:-20 }} src={image} className="" />
       </div>
       <div className="bg-white mt-2">

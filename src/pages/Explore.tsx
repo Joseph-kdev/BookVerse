@@ -6,7 +6,8 @@ import { Genres } from "../types";
 import { RotateLoader } from "react-spinners";
 import Nav from "../components/Nav";
 import Book from "../components/Book";
-import { AnimatePresence, motion } from "framer-motion";
+import { animate, AnimatePresence, motion } from "framer-motion";
+import "../index.css";
 
 export default function Explore() {
   const [activeTab, setActiveTab] = useState<string>("our-picks");
@@ -29,8 +30,10 @@ export default function Explore() {
     "popular-genres": [
       "FICTION",
       "NONFICTION",
+      "POETRY",
       "BIOGRAPHY & AUTOBIOGRAPHY",
       "COMICS & GRAPHIC NOVELS",
+      "POETRY",
       "COOKING",
       "FAMILY & RELATIONSHIPS",
       "HISTORY",
@@ -42,28 +45,21 @@ export default function Explore() {
     ],
     "other-genres": [
       "ANTIQUES & COLLECTIBLES",
-      "ARCHITECTURE",
       "ART",
       "BUSINESS & ECONOMICS",
       "COMPUTERS",
-      "CRAFTS & HOBBIES",
       "DESIGN",
       "DRAMA",
-      "EDUCATION",
       "HUMOR",
       "LANGUAGE ARTS & DISCIPLINES",
       "LAW",
       "LITERARY COLLECTIONS",
       "LITERARY CRITICISM",
       "MATHEMATICS",
-      "MEDICAL",
       "MUSIC",
       "NATURE",
       "PHOTOGRAPHY",
-      "POETRY",
       "POLITICAL SCIENCE",
-      "PSYCHOLOGY",
-      "REFERENCE",
       "RELIGION",
       "SCIENCE",
       "SPORTS & RECREATION",
@@ -99,6 +95,11 @@ export default function Explore() {
     initializeGenre();
   }, [activeTab]);
 
+  const variants = {
+    initial: { opacity: 0, transform: "translateY(10px)" },
+    animate: { opacity: 1, transform: "translateY(0px)" },
+    exit: { opacity: 0, transform: "translateY(10px)" },
+  };
   return (
     <section className="bg-light-background dark:bg-dark-background min-h-screen">
       <Nav />
@@ -131,23 +132,15 @@ export default function Explore() {
           </div>
           {/* Genre Grid */}
           <div className="">
-            <AnimatePresence mode="popLayout">
-              <motion.div
+              <div
                 key={activeTab}
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.9 }}
-                transition={{
-                  type:"spring",
-                  duration: 0.3
-                }}
                 className="flex overflow-scroll scroll-smooth lg:grid lg:grid-cols-2 lg:gap-2 lg:overflow-hidden mt-1 font-Oxanium text-sm"
               >
-                {genres[activeTab].map((genre: string) => (
-                  <motion.button
-                    whileTap={{ scale: 0.95 }}
+                {genres[activeTab].map((genre: string, index: number) => (
+                  <button
+                    style={{ "--genreIndex": index + 1 }}
                     key={genre}
-                    className={`
+                    className={`wavy-fade
                       text-xs max-h-[50px] min-w-[150px]
                       px-2 py-2 m-1 md:text-sm font-medium
                       hover:bg-light-accent dark:hover:bg-dark-accent
@@ -163,10 +156,9 @@ export default function Explore() {
                     onClick={() => findGenreBooks(genre)}
                   >
                     {_.capitalize(genre)}
-                  </motion.button>
+                  </button>
                 ))}
-              </motion.div>
-            </AnimatePresence>
+              </div>
           </div>
         </div>
 
