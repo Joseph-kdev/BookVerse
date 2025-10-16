@@ -17,17 +17,16 @@ export default function Nav() {
   };
 
   const {scrollY} = useScroll()
-  const backgroundColor = useTransform(scrollY, [0, 200], ["#F9F6F0", "transparent"], { ease: circInOut})
 
   return (
-    <motion.nav style={{ backgroundColor: backgroundColor}} className="flex justify-between p-2 md:px-4 bg-light-background dark:bg-dark-background sticky top-0 items-center text-light-background dark:text-dark-background z-50">
+    <nav className="flex justify-between p-2 md:px-4 sticky top-0 items-center z-50 backdrop-blur">
       <div className="flex items-center">
         <BookOpen className="h-8 w-8 text-amber-500" />
-        <span className="absolute left-12 ml-2 text-xl font-bold text-light-text dark:text-dark-text hidden md:block">
+        <span className="absolute left-12 ml-2 text-xl font-bold text-dark-text dark:text-dark-text hidden md:block">
           BookVerse
         </span>
       </div>
-      <div className="bg-light-primary dark:bg-dark-primary p-2 rounded-full w-[200px] md:min-w-[300px] flex justify-evenly">
+      <div className="bg-light-primary dark:bg-dark-primary p-2 rounded-full w-[200px] md:min-w-[300px] flex justify-evenly text-light-background/80 dark:text-dark-background">
         <div>
           <NavLink to="/" className={({isActive}) => isActive ? "text-light-accent" : ""}>
             <Home size={24} className="md:hidden"
@@ -122,6 +121,6 @@ export default function Nav() {
           </svg>
         </div>
       </div> */}
-    </motion.nav>
+    </nav>
   );
 }

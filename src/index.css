@@ -2,6 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  overscroll-behavior: none;
+}
 body {
     margin: 0;
 }
