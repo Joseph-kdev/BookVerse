@@ -6,20 +6,20 @@
   overscroll-behavior: none;
 }
 body {
-    margin: 0;
+  margin: 0;
 }
 
 .search-modal {
-    background-color: rgba(0.5, 0.5, 0.5, 0.3);
-    margin: 8px;
-    padding-top: 12px;
-    min-height: 100vh;
+  background-color: rgba(0.5, 0.5, 0.5, 0.3);
+  margin: 8px;
+  padding-top: 12px;
+  min-height: 100vh;
 }
 
 @media screen and (min-width: 768px) {
-    .search-modal {
-        margin: 20px 10vw;
-    }
+  .search-modal {
+    margin: 20px 10vw;
+  }
 }
 
 /* Fade animations */
@@ -86,7 +86,7 @@ body {
     -ms-transform: translateY(20px);
     -o-transform: translateY(20px);
     -webkit-filter: blur(4px);
-}
+  }
   to {
     transform: translateY(0);
     opacity: 1;
@@ -96,11 +96,20 @@ body {
     -ms-transform: translateY(0);
     -o-transform: translateY(0);
     -webkit-filter: blur(0px);
-}
+  }
 }
 
 .wavy-fade {
   --delay: 90ms;
   animation: fade-in ease-out 0.1s both;
   animation-delay: calc(var(--delay) * var(--genreIndex));
+}
+
+@keyframes marquee {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
 }

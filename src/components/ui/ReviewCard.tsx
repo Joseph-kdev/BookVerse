@@ -1,5 +1,4 @@
 import React from 'react';
-import { Star } from 'lucide-react';
 
 interface ReviewCardProps {
   name: string;
@@ -9,9 +8,9 @@ interface ReviewCardProps {
   image: string;
 }
 
-const ReviewCard: React.FC<ReviewCardProps> = ({ name, role, review, rating, image }) => {
+const ReviewCard: React.FC<ReviewCardProps> = ({ name, role, review, image }) => {
   return (
-    <div className="bg-white p-6 rounded-xl shadow-md flex flex-col">
+    <div className="bg-white text-sm p-6 rounded-xl shadow-md flex flex-col w-[340px] hover:shadow-2xl">
       <div className="flex items-center mb-4">
         <img
           src={image}
@@ -23,18 +22,7 @@ const ReviewCard: React.FC<ReviewCardProps> = ({ name, role, review, rating, ima
           <p className="text-sm text-gray-500">{role}</p>
         </div>
       </div>
-      
-      <div className="flex mb-3">
-        {Array.from({ length: 5 }).map((_, i) => (
-          <Star
-            key={i}
-            className={`w-4 h-4 ${
-              i < rating ? 'text-amber-500 fill-amber-500' : 'text-gray-300'
-            }`}
-          />
-        ))}
-      </div>
-      
+    
       <p className="text-gray-600 italic">{review}</p>
     </div>
   );

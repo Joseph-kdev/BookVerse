@@ -9,6 +9,7 @@ import Footer from "../components/Footer";
 import { addUser } from "../services/requests";
 import { auth } from "../config/firebase-config";
 import { motion } from "framer-motion";
+import Marquee from "../components/ui/Marquee";
 
 export default function Home() {
   const { user } = useUserAuthContext();
@@ -89,6 +90,14 @@ export default function Home() {
         "https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=800",
     },
     {
+      name: "Lisa Anderson",
+      role: "Librarian",
+      review:
+        "The catalog is extensive and the search functionality is incredibly intuitive. Highly recommend!",
+      image: "https://i.pravatar.cc/150?img=5",
+      rating: 5,
+    },
+    {
       name: "Claire",
       role: "Literature Blogger",
       review:
@@ -96,6 +105,22 @@ export default function Home() {
       rating: 5,
       image:
         "https://images.pexels.com/photos/1130626/pexels-photo-1130626.jpeg?auto=compress&cs=tinysrgb&w=800",
+    },
+    {
+      name: "Sarah Johnson",
+      role: "Book Enthusiast",
+      review:
+        "This app has completely transformed how I discover and read books. The AI recommendations are spot-on!",
+      image: "https://i.pravatar.cc/150?img=1",
+      rating: 5,
+    },
+    {
+      name: "David Kim",
+      role: "Teacher",
+      review:
+        "My students are more engaged with reading thanks to this platform. The gamification works wonders!",
+      image: "https://i.pravatar.cc/150?img=4",
+      rating: 5,
     },
   ];
 
@@ -194,9 +219,7 @@ export default function Home() {
               </div>
             </div>
           </section>
-          <section
-            className="relative z-20 py-20 bg-light-background dark:bg-dark-background"
-          >
+          <section className="relative z-20 py-20 bg-light-background dark:bg-dark-background">
             <div className="container mx-auto px-4 md:px-6 lg:px-8">
               <div className="text-center mb-16">
                 <h2 className="text-3xl md:text-4xl font-bold text-navy-900 mb-4 dark:text-gray-100">
@@ -224,11 +247,9 @@ export default function Home() {
           </section>
         </section>
         <section className="relative top-[-100vh]">
-          <section
-            className="sticky top-0 z-10 py-20 min-h-screen bg-light-background dark:bg-dark-background"
-          >
+          <section className="sticky top-0 z-10 py-20 min-h-screen bg-light-background dark:bg-dark-background">
             <div className="container mx-auto px-4 md:px-6 lg:px-[10%]">
-              <div className="text-center mb-16">
+              <div className="text-center mb-6">
                 <h2 className="text-3xl md:text-4xl font-bold text-navy-900 mb-4 dark:text-gray-100">
                   What Our Users Say
                 </h2>
@@ -238,7 +259,7 @@ export default function Home() {
                 </p>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              <Marquee speed={50}>
                 {reviews.map((review, index) => (
                   <ReviewCard
                     key={index}
@@ -249,12 +270,22 @@ export default function Home() {
                     image={review.image}
                   />
                 ))}
-              </div>
+              </Marquee>
+              <Marquee speed={60} direction="right">
+                {reviews.map((review, index) => (
+                  <ReviewCard
+                    key={index}
+                    name={review.name}
+                    role={review.role}
+                    review={review.review}
+                    rating={review.rating}
+                    image={review.image}
+                  />
+                ))}
+              </Marquee>
             </div>
           </section>
-          <section
-            className="relative top-[100vh] min-h-screen py-10 bg-light-background dark:bg-dark-background"
-          >
+          <section className="relative top-[100vh] min-h-screen py-10 bg-light-background dark:bg-dark-background">
             <div className="container mx-auto px-4 md:px-6 lg:px-8">
               <div className="max-w-4xl mx-auto bg-white rounded-xl shadow-md overflow-hidden">
                 <div className="md:flex">
