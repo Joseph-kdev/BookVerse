@@ -6,7 +6,7 @@ import { Genres } from "../types";
 import { RotateLoader } from "react-spinners";
 import Nav from "../components/Nav";
 import Book from "../components/Book";
-import { animate, AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import "../index.css";
 
 export default function Explore() {

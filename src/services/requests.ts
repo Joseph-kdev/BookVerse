@@ -11,6 +11,7 @@ import {
 const bestSellersUrl: string = "https://api.nytimes.com/svc/books/v3/lists/";
 const googleBooksUrl: string = "https://www.googleapis.com/books/v1/volumes";
 const serverUrl: string = import.meta.env.VITE_SERVER_URL;
+// const serverUrl = "http://localhost:3001"
 
 const nyt_key = import.meta.env.VITE_NYT_API_KEY;
 const google_key = import.meta.env.VITE_BOOKS_API_KEY;
@@ -82,32 +83,22 @@ export const getGenreBooks = async (genre: string): Promise<GoogleBook[]> => {
     }
 
     const response = await axios.get(
-      `${googleBooksUrl}/?q=subject:${genre}&api-key=${google_key}&orderBy=relevance&maxResults=40`
+      `${serverUrl}/api/books/fetch_by_genre/${genre}`
     );
 
-    const foundBooks: GoogleBook[] = response.data.items.map(
-      (item: {
-        id: string;
-        volumeInfo: {
-          title: string;
-          authors: string[];
-          description: string;
-          imageLinks: ImageLinks;
-          publisher: string;
-          categories: string[];
-          industryIdentifiers: IndustryIdentifier;
-        };
-      }) => ({
+    const foundBooks: GoogleBook[] = response.data.map(
+      (item: GoogleBook) => ({
         id: item.id,
-        title: item.volumeInfo.title,
-        authors: item.volumeInfo.authors,
-        description: item.volumeInfo.description,
-        imageLinks: item.volumeInfo.imageLinks,
-        publisher: item.volumeInfo.publisher,
-        categories: item.volumeInfo.categories,
-        isbnValue: item.volumeInfo.industryIdentifiers,
+        title: item.title,
+        authors: item.authors,
+        description: item.description,
+        imageLinks: item.imageLinks,
+        publisher: item.publisher,
+        categories: item.categories,
+        isbnValue: item.isbnValue,
       })
     );
+
     sessionStorage.setItem(`${genre}`, JSON.stringify(foundBooks));
     return foundBooks;
   } catch (error) {
