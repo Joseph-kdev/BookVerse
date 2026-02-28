@@ -1,8 +1,8 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { useUserAuthContext } from "../config/UserAuthContext";
 import { signOut } from "firebase/auth";
 import { auth } from "../config/firebase-config";
-import { BookOpen, Compass, Home, Library } from "lucide-react";
+import { BookOpen, Compass, Home, Library, LogOut } from "lucide-react";
 import { circInOut, motion, useScroll, useTransform } from "framer-motion";
 
 export default function Nav() {
@@ -11,9 +11,15 @@ export default function Nav() {
   };
 
   const { user } = useUserAuthContext();
+  const navigate = useNavigate();
 
   const handleLogOut = async () => {
-    await signOut(auth);
+    try {
+      await signOut(auth);
+      navigate("/login");
+    } catch (error) {
+      console.error("Error logging out", error);
+    }
   };
 
   const {scrollY} = useScroll()
@@ -50,7 +56,7 @@ export default function Nav() {
           </div>
         )}
       </div>
-      <div className="ml-1 cursor-pointer">
+      <div className="flex items-center gap-4 ml-1 cursor-pointer">
         <NavLink to="/search" className={({isActive}) => isActive ? "text-light-accent" : ""}>
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -67,41 +73,16 @@ export default function Nav() {
             />
           </svg>
         </NavLink>
+        {user && (
+          <button
+            onClick={handleLogOut}
+            className="text-light-text dark:text-dark-text hover:text-light-accent dark:hover:text-light-accent transition-colors"
+            title="Log Out"
+          >
+            <LogOut className="size-6" />
+          </button>
+        )}
       </div>
-                {/* {user && (
-          <div className=" bg-light-background dark:bg-dark-primary rounded-full cursor-pointer p-1">
-            <svg
-              width="24px"
-              height="24px"
-              stroke-width="1.5"
-              viewBox="0 0 24 24"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              className="text-light-text dark:text-dark-text"
-              onClick={handleLogOut}
-            >
-              <path
-                d="M2 18V6C2 4.34315 3.34315 3 5 3H7C8.65685 3 10 4.34315 10 6V18C10 19.6569 8.65685 21 7 21H5C3.34315 21 2 19.6569 2 18Z"
-                stroke="#000000"
-                stroke-width="1.5"
-              ></path>
-              <path
-                d="M16 3H18C20.2091 3 22 4.79086 22 7V17C22 19.2091 20.2091 21 18 21H16"
-                stroke="#000000"
-                stroke-width="1.5"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              ></path>
-              <path
-                d="M10 12H18M18 12L15 9M18 12L15 15"
-                stroke="#000000"
-                stroke-width="1.5"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              ></path>
-            </svg>
-          </div>
-        )} */}
       {/* <div className="absolute right-2 top-[92vh] bg-light-background dark:bg-dark-background rounded-full cursor-pointer p-1">
         <div className=" bg-light-background dark:bg-dark-background rounded-full cursor-pointer p-1">
           <svg
