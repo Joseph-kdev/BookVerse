@@ -33,7 +33,6 @@ export default function Explore() {
       "POETRY",
       "BIOGRAPHY & AUTOBIOGRAPHY",
       "COMICS & GRAPHIC NOVELS",
-      "POETRY",
       "COOKING",
       "FAMILY & RELATIONSHIPS",
       "HISTORY",
@@ -90,16 +89,12 @@ export default function Explore() {
 
   useEffect(() => {
     const initializeGenre = async () => {
-      await findGenreBooks("classics");
+      await findGenreBooks("FICTION");
     };
     initializeGenre();
   }, [activeTab]);
 
-  const variants = {
-    initial: { opacity: 0, transform: "translateY(10px)" },
-    animate: { opacity: 1, transform: "translateY(0px)" },
-    exit: { opacity: 0, transform: "translateY(10px)" },
-  };
+
   return (
     <section className="bg-light-background dark:bg-dark-background min-h-screen">
       <Nav />

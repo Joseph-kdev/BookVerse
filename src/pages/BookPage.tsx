@@ -369,7 +369,7 @@ export default function BookPage() {
             >
               Author(s):{" "}
               {bookData.authors?.map((a) => (
-                <span>{a}</span>
+                <span>{a}{" "}</span>
               ))}
             </motion.p>
             <motion.p
@@ -394,7 +394,7 @@ export default function BookPage() {
             >
               Genre(s):{" "}
               {bookData.categories?.map((g) => (
-                <span key={g}>{g}</span>
+                <span key={g}>{g.toLowerCase()}{" "}</span>
               ))}
             </motion.p>
             <motion.div
