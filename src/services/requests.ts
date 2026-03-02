@@ -87,22 +87,22 @@ export const getGenreBooks = async (genre: string): Promise<GoogleBook[]> => {
     );
 
     const foundBooks: GoogleBook[] = response.data.map(
-      (item: GoogleBook) => ({
-        id: item.id,
-        title: item.title,
-        authors: item.authors,
-        description: item.description,
-        imageLinks: item.imageLinks,
-        publisher: item.publisher,
-        categories: item.categories,
-        isbnValue: item.isbnValue,
+      (item:any) => ({
+        id: item.Books.id,
+        title: item.Books.title,
+        authors: item.Books.authors,
+        description: item.Books.description,
+        imageLinks: item.Books.imageLinks,
+        publisher: item.Books.publisher,
+        categories: item.Books.categories,
+        isbnValue: item.Books.isbnValue,
       })
     );
+
 
     sessionStorage.setItem(`${genre}`, JSON.stringify(foundBooks));
     return foundBooks;
   } catch (error) {
-    console.error("Error fetching genre", error);
     throw new Error("Failed to fetch genre");
   }
 };
@@ -140,7 +140,6 @@ export const getDownloadLinks = async (title: string): Promise<BookLinks[]> => {
     sessionStorage.setItem(`${title}`, JSON.stringify(foundLinks));
     return foundLinks;
   } catch (error) {
-    console.error("Error fetching links", error);
     throw new Error("Failed to fetch links");
   }
 };
@@ -245,7 +244,6 @@ const getUser = async (userId: string) => {
     );
     return response.data;
   } catch (error) {
-    console.log("Error finding user", error);
     return null;
   }
 };
@@ -277,7 +275,6 @@ export const getBookFromDb = async (bookId: string) => {
     if (response.status != 200) {
       return null;
     }
-    console.log("book returned", response);
     return response.data;
   } catch (error) {
     console.log("Error finding book", error);
@@ -394,7 +391,6 @@ export const toggleFavorite = async ({
     userId,
     bookId,
   });
-  console.log("changed favorite state");
   return response.data;
 };
 

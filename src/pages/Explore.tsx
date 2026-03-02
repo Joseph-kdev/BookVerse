@@ -89,7 +89,7 @@ export default function Explore() {
 
   useEffect(() => {
     const initializeGenre = async () => {
-      await findGenreBooks("FICTION");
+      await findGenreBooks("fiction");
     };
     initializeGenre();
   }, [activeTab]);
@@ -142,13 +142,13 @@ export default function Explore() {
                       rounded-lg transition-colors
                       text-light-background dark:text-dark-background
                       ${
-                        selectedGenre === genre
+                        selectedGenre === genre.toLowerCase()
                           ? "bg-[#dfbf90] dark:bg-[#6f4f20] text-gray-900 shadow-sm border border-gray-200"
                           : "bg-light-primary dark:bg-dark-primary text-gray-900"
                       }
                       focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2
                     `}
-                    onClick={() => findGenreBooks(genre)}
+                    onClick={() => findGenreBooks(genre.toLowerCase())}
                   >
                     {_.capitalize(genre)}
                   </button>
@@ -159,7 +159,7 @@ export default function Explore() {
 
         {/*Books */}
         {error && (
-          <div className="flex flex-col items-center mt-4 w-full h-full">
+          <div className="flex-1 flex flex-col justify-center items-center mt-4">
             <img src="/sad-pup.svg" width={400} alt="" />
             <p className="text-sm font-Oxanium mt-1 text-red-500">
               Something went wrong!
