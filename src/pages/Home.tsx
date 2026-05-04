@@ -8,7 +8,6 @@ import { useEffect, useState } from "react";
 import Footer from "../components/Footer";
 import { addUser } from "../services/requests";
 import { auth } from "../config/firebase-config";
-import { motion } from "framer-motion";
 import Marquee from "../components/ui/Marquee";
 
 export default function Home() {
@@ -31,42 +30,42 @@ export default function Home() {
       description:
         "Create personalized reading lists to organize your 'to-read', 'currently reading', and 'finished' books with ease.",
       icon: BookMarked,
-      image: "smart.png",
+      image: "smart.jpg",
     },
     {
       title: "Favorites at Your Fingertips",
       description:
         "Instantly access your favorite books and build a collection that reflects your literary taste.",
       icon: Heart,
-      image: "fav.png",
+      image: "fav.jpg",
     },
     {
       title: "Genre-Based Discovery",
       description:
         "Browse books by genre and uncover new reads tailored to your mood or interests.",
       icon: Layers,
-      image: "genre.png",
+      image: "genre.jpg",
     },
     {
       title: "Powerful Book Search",
       description:
         "Search by title, author, or keywords and get quick, accurate results from a rich dataset.",
       icon: Search,
-      image: "find.png",
+      image: "find.jpg",
     },
     {
       title: "Download & Access Easily",
       description:
         "Get free download links for books—no more hunting across sketchy sites.",
       icon: Download,
-      image: "download.png",
+      image: "download.jpg",
     },
     {
       title: "Built-in Book Assistant",
       description:
         "Each book page features an AI chatbot that offers summaries, insights, and recommendations tailored to that title.",
       icon: Bot,
-      image: "bot.png",
+      image: "bot.jpg",
     },
   ];
 
