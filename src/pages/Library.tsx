@@ -55,7 +55,6 @@ export default function Library() {
     queryKey: ["books"],
     queryFn: () => fetchAll(),
     enabled: !!user,
-    initialData: [],
   });
 
   const bookTabs = async (activeTab: string) => {
@@ -83,7 +82,7 @@ export default function Library() {
         return;
       }
       if (activeTab === "all") {
-        setBooksToshow(books);
+        setBooksToshow(books || []);
         return;
       }
       const result = await bookTabs(activeTab);
@@ -109,11 +108,10 @@ export default function Library() {
               <button
                 key={id}
                 onClick={() => setActiveTab(id as typeof activeTab)}
-                className={`flex items-center px-4 py-2 rounded-full whitespace-nowrap transition-colors ${
-                  activeTab === id
-                    ? "bg-light-accent text-light-text"
-                    : "bg-white text-gray-600 hover:bg-gray-100"
-                }`}
+                className={`flex items-center px-4 py-2 rounded-full whitespace-nowrap transition-colors ${activeTab === id
+                  ? "bg-light-accent text-light-text"
+                  : "bg-white text-gray-600 hover:bg-gray-100"
+                  }`}
               >
                 <Icon className="h-5 w-5 mr-2" />
                 {label}
@@ -140,7 +138,7 @@ export default function Library() {
               ))}
             </div>
           ) : isLoading ? (
-            <div className="w-full h-full flex justify-center items-center">
+            <div className="w-full h-[50vh] flex justify-center items-center">
               <PropagateLoader size={25} color="#ffc107" />
             </div>
           ) : isError ? (

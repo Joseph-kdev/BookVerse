@@ -171,7 +171,7 @@ export default function Explore() {
             <RotateLoader size={10} color="#ffc107" />
           </div>
         ) : (
-          <div className="flex gap-2 w-full flex-wrap mt-2 justify-evenly lg:col-span-2 lg:ml-5 lg:max-w-[93%] lg:grid lg:grid-cols-5">
+          <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 w-full mt-2 lg:col-span-2 lg:ml-5 lg:max-w-[93%]">
             {books.map((bk) => (
               <div key={bk.id}>
                 <Book

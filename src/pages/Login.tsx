@@ -23,7 +23,7 @@ export default function Login() {
       await signInWithPopup(auth, googleProvider);
       navigate("/");
     } catch (error) {
-      console.error("Problem logging in" + error);
+      toast.error(error instanceof Error ? error.message : "Failed to log in with Google");
     }
   };
 
@@ -42,14 +42,12 @@ export default function Login() {
       if (!user.hasAccount) {
         await createUserWithEmailAndPassword(auth, email, password);
         navigate("/");
-        console.log("User created");
       } else {
         await signInWithEmailAndPassword(auth, email, password);
         navigate("/");
-        console.log("user signed in");
       }
     } catch (error) {
-      console.error(error);
+      toast.error(error instanceof Error ? error.message : "An error occurred");
     }
   };
 
@@ -61,23 +59,23 @@ export default function Login() {
     <div className="flex h-screen bg-[url('/homebg1.jpg')] bg-cover bg-center bg-no-repeat">
       <div className="w-full bg-[rgba(0,0,0,0.63)] dark:bg-[rgba(255,255,255,0.11)] flex items-center justify-center h-[100vh] rounded-md">
         <div className="max-w-md w-full p-6 bg-light-primary dark:bg-dark-primary rounded-lg">
-        <div className="absolute right-3 top-[20px] bg-light-background dark:bg-dark-background rounded-full cursor-pointer p-1">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          strokeWidth={1.5}
-          stroke={"currentColor"}
-          className="size-6 text-light-text dark:text-dark-text"
-          onClick={toggleDarkMode}
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M12 3v2.25m6.364.386-1.591 1.591M21 12h-2.25m-.386 6.364-1.591-1.591M12 18.75V21m-4.773-4.227-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z"
-          />
-        </svg>
-      </div>
+          <div className="absolute right-3 top-[20px] bg-light-background dark:bg-dark-background rounded-full cursor-pointer p-1">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={1.5}
+              stroke={"currentColor"}
+              className="size-6 text-light-text dark:text-dark-text"
+              onClick={toggleDarkMode}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M12 3v2.25m6.364.386-1.591 1.591M21 12h-2.25m-.386 6.364-1.591-1.591M12 18.75V21m-4.773-4.227-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z"
+              />
+            </svg>
+          </div>
           <div className="flex justify-center mb-6">
             <img src="/bestseller.svg" alt="logo" className="h-[80px] mx-1" />
           </div>
