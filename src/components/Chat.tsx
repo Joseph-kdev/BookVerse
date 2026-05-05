@@ -17,9 +17,6 @@ const BookChat = ({ title, author }: { title: string; author: string }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [sessionId] = useState(() => crypto.randomUUID());
-  const [streamingMessageId, setStreamingMessageId] = useState<string | null>(
-    null
-  );
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -51,7 +48,6 @@ const BookChat = ({ title, author }: { title: string; author: string }) => {
     setCurrentMessage("");
     setIsLoading(true);
     setError(null);
-    setStreamingMessageId(assistantMessageId);
 
     try {
       await chatAboutBook({
@@ -59,7 +55,7 @@ const BookChat = ({ title, author }: { title: string; author: string }) => {
         author: author,
         message: userMessage.content,
         sessionId,
-        onChunk: (text: string, sessionId: string) => {
+        onChunk: (text: string) => {
           setMessages((prev) =>
             prev.map((msg) =>
               msg.id === assistantMessageId
@@ -77,12 +73,10 @@ const BookChat = ({ title, author }: { title: string; author: string }) => {
             )
           );
           setIsLoading(false);
-          setStreamingMessageId(null);
         },
         onError: (errorMessage: string) => {
           setError(errorMessage);
           setIsLoading(false);
-          setStreamingMessageId(null);
           // Remove the failed message
           setMessages((prev) =>
             prev.filter((msg) => msg.id !== assistantMessageId)
@@ -92,7 +86,6 @@ const BookChat = ({ title, author }: { title: string; author: string }) => {
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to send message");
       setIsLoading(false);
-      setStreamingMessageId(null);
       setMessages((prev) =>
         prev.filter((msg) => msg.id !== assistantMessageId)
       );
