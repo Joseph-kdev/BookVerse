@@ -27,10 +27,9 @@ import {
   AnimatePresence,
   motion,
   MotionConfig,
-  stagger,
-  transform,
 } from "framer-motion";
 import { useOnClickOutside } from "usehooks-ts";
+import Reviews from "../components/Reviews";
 
 export default function BookPage() {
   const { title } = useParams();
@@ -42,8 +41,6 @@ export default function BookPage() {
     reading: false,
     favorite: false,
   });
-  const [loading, setloading] = useState(false);
-  const [error, setError] = useState(null);
 
   const { user } = useUserAuthContext();
   const [status, setStatus] = useState("Want to Read");
@@ -149,16 +146,6 @@ export default function BookPage() {
     }
     try {
       if (action === "add") {
-        await addBookToDb({
-          id: bookData.id,
-          title: bookData.title,
-          authors: bookData.authors,
-          description: bookData.description,
-          imageLinks: bookData.imageLinks,
-          publisher: bookData.publisher,
-          categories: bookData.categories,
-          isbnValue: bookData.isbnValue || [],
-        });
         await saveBookToLibrary({
           userId: user.uid,
           bookId: bookData.id,
@@ -166,7 +153,7 @@ export default function BookPage() {
         });
         setBookInCollection((prev) => ({ ...prev, [status]: true }));
         toast.success(`${bookData.title} added to ${status}`, {
-          duration: 4000,
+          duration: 2000,
           position: "top-center",
           icon: "✅",
           className: "text-sm text-light-text",
@@ -181,7 +168,7 @@ export default function BookPage() {
         });
         setBookInCollection((prev) => ({ ...prev, [status]: false }));
         toast.success(`${bookData.title} removed from ${status}`, {
-          duration: 4000,
+          duration: 2000,
           position: "top-center",
           icon: "❌",
           className: "text-sm text-light-text",
@@ -201,16 +188,6 @@ export default function BookPage() {
       return;
     }
     try {
-      await addBookToDb({
-        id: bookData.id,
-        title: bookData.title,
-        authors: bookData.authors,
-        description: bookData.description,
-        imageLinks: bookData.imageLinks,
-        publisher: bookData.publisher,
-        categories: bookData.categories,
-        isbnValue: bookData.isbnValue || [],
-      });
       await toggleFavorite({ userId, bookId });
       if (bookInCollection["favorite"] == false) {
         setBookInCollection((prev) => ({ ...prev, favorite: true }));
@@ -253,7 +230,7 @@ export default function BookPage() {
     const checkBookExistence = async () => {
       if (!user) return;
       const bookQuery = await checkStatus({
-        userId: user.uid,
+        userId: user.uid as string,
         bookId: bookData.id,
       });
 
@@ -265,7 +242,7 @@ export default function BookPage() {
     };
     const checkBookFavorite = async () => {
       const bookQuery = await checkFavorite({
-        userId: user?.uid,
+        userId: user?.uid as string,
         bookId: bookData.id,
       });
       if (bookQuery.length == 0) {
@@ -277,6 +254,20 @@ export default function BookPage() {
     checkBookExistence();
     checkBookFavorite();
   }, [user, bookData.id]);
+
+  // Add this useEffect after your existing ones
+  useEffect(() => {
+    addBookToDb({
+      id: bookData.id,
+      title: bookData.title,
+      authors: bookData.authors,
+      description: bookData.description,
+      imageLinks: bookData.imageLinks,
+      publisher: bookData.publisher,
+      categories: bookData.categories,
+      isbnValue: bookData.isbnValue || [],
+    });
+  }, []);
 
   //fetch download links
   const {
@@ -295,7 +286,7 @@ export default function BookPage() {
   };
 
   return (
-    <div className="bg-light-background dark:bg-dark-background h-screen">
+    <div className="bg-light-background dark:bg-dark-background min-h-screen">
       <Nav />
       <div className="md:hidden">
         <motion.h2
@@ -397,6 +388,7 @@ export default function BookPage() {
                 <span key={g}>{g.toLowerCase()}{" "}</span>
               ))}
             </motion.p>
+            <Reviews bookId={bookData.id} />
             <motion.div
               variants={variants}
               initial="initial"

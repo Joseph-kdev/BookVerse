@@ -7,11 +7,12 @@ import {
   IndustryIdentifier,
   StatusEnum,
 } from "../types";
+import { Review } from "../components/Reviews";
 
 const bestSellersUrl: string = "https://api.nytimes.com/svc/books/v3/lists/";
 const googleBooksUrl: string = "https://www.googleapis.com/books/v1/volumes";
-const serverUrl: string = import.meta.env.VITE_SERVER_URL;
-// const serverUrl = "http://localhost:3001"
+// const serverUrl: string = import.meta.env.VITE_SERVER_URL;
+const serverUrl = "http://localhost:3001"
 
 const nyt_key = import.meta.env.VITE_NYT_API_KEY;
 const google_key = import.meta.env.VITE_BOOKS_API_KEY;
@@ -251,9 +252,11 @@ const getUser = async (userId: string) => {
 export const addUser = async ({
   userId,
   email,
+  displayName
 }: {
   userId: string;
   email: string | null;
+  displayName: string | null;
 }) => {
   const foundUser = await getUser(userId);
   if (foundUser) {
@@ -262,6 +265,7 @@ export const addUser = async ({
   const response = await axios.post(`${serverUrl}/api/users/add_user`, {
     userId: userId,
     email: email,
+    displayName: displayName
   });
   return response.data;
 };
@@ -426,5 +430,27 @@ export const getFavorites = async(userId: string | undefined) => {
     throw new Error("No user Id found")
   }
   const response = await axios.get(`${serverUrl}/api/books/get_favorites/${userId}`)
+  return response.data
+}
+
+export const postReview = async(review : Review) => {
+  const response = await axios.post(`${serverUrl}/api/reviews`, 
+    review
+  )
+  return response.data
+}
+
+export const getReviews = async(bookId: string) => {
+  const response = await axios.get(`${serverUrl}/api/reviews/${bookId}`)
+  return response.data
+}
+
+export const likeReview = async(reviewId: number) => {
+  const response = await axios.post(`${serverUrl}/api/reviews/${reviewId}/like`)
+  return response.data
+}
+
+export const unlikeReview = async(reviewId: number) => {
+  const response = await axios.post(`${serverUrl}/api/reviews/${reviewId}/unlike`)
   return response.data
 }

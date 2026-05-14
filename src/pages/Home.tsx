@@ -17,7 +17,7 @@ export default function Home() {
     const addUserToDb = async () => {
       auth.onAuthStateChanged(async (user) => {
         if (user) {
-          await addUser({ userId: user.uid, email: user.email });
+          await addUser({ userId: user.uid, email: user.email, displayName: user.displayName });
         }
       });
     };

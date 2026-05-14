@@ -3,7 +3,6 @@ import { useUserAuthContext } from "../config/UserAuthContext";
 import { signOut } from "firebase/auth";
 import { auth } from "../config/firebase-config";
 import { BookOpen, Compass, Home, Library, LogOut } from "lucide-react";
-import { circInOut, motion, useScroll, useTransform } from "framer-motion";
 
 export default function Nav() {
   const toggleDarkMode = () => {
@@ -21,8 +20,6 @@ export default function Nav() {
       console.error("Error logging out", error);
     }
   };
-
-  const {scrollY} = useScroll()
 
   return (
     <nav className="flex justify-between p-2 md:px-4 sticky top-0 items-center z-50 backdrop-blur">

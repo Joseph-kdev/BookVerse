@@ -8,6 +8,7 @@ import {
 } from "firebase/auth";
 import { auth, googleProvider } from "../config/firebase-config";
 import toast from "react-hot-toast";
+import Nav from "../components/Nav";
 
 export default function Login() {
   const [user, dispatch] = useReducer(userReducer, {
@@ -56,7 +57,8 @@ export default function Login() {
   };
 
   return (
-    <div className="flex h-screen bg-[url('/homebg1.jpg')] bg-cover bg-center bg-no-repeat">
+    <div className="min-h-screen bg-[url('/homebg1.jpg')] bg-cover bg-fixed bg-center bg-no-repeat">
+      <Nav />
       <div className="w-full bg-[rgba(0,0,0,0.63)] dark:bg-[rgba(255,255,255,0.11)] flex items-center justify-center h-[100vh] rounded-md">
         <div className="max-w-md w-full p-6 bg-light-primary dark:bg-dark-primary rounded-lg">
           <div className="absolute right-3 top-[20px] bg-light-background dark:bg-dark-background rounded-full cursor-pointer p-1">
