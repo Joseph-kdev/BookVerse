@@ -11,8 +11,8 @@ import { Review } from "../components/Reviews";
 
 const bestSellersUrl: string = "https://api.nytimes.com/svc/books/v3/lists/";
 const googleBooksUrl: string = "https://www.googleapis.com/books/v1/volumes";
-// const serverUrl: string = import.meta.env.VITE_SERVER_URL;
-const serverUrl = "http://localhost:3001"
+const serverUrl: string = import.meta.env.VITE_SERVER_URL;
+// const serverUrl = "http://localhost:3001"
 
 const nyt_key = import.meta.env.VITE_NYT_API_KEY;
 const google_key = import.meta.env.VITE_BOOKS_API_KEY;
