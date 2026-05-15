@@ -5,6 +5,7 @@ import toast from "react-hot-toast";
 import { getReviews, postReview } from "../services/requests";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import ReviewList from "./ReviewList";
+import { HashLoader } from "react-spinners";
 
 export interface Review {
     userId: string;
@@ -184,7 +185,9 @@ export default function Reviews({ bookId }: { bookId: string }) {
             </div>
             <div>
                 {isLoading ? (
-                    <div className="text-center py-12 text-gray-500">Loading reviews...</div>
+                    <div className="w-full flex justify-center py-8">
+                        <HashLoader size={24} color="gray" />
+                    </div>
                 ) : isError ? (
                     <div className="text-center py-12 text-gray-500">Error loading reviews</div>
                 ) : (

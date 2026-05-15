@@ -42,10 +42,10 @@ export default function Login() {
     try {
       if (!user.hasAccount) {
         await createUserWithEmailAndPassword(auth, email, password);
-        navigate("/");
+        navigate("/explore");
       } else {
         await signInWithEmailAndPassword(auth, email, password);
-        navigate("/");
+        navigate("/explore");
       }
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "An error occurred");
