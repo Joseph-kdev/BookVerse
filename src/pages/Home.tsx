@@ -1,5 +1,5 @@
 import Nav from "../components/Nav";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useUserAuthContext } from "../config/UserAuthContext";
 import FeatureCard from "../components/ui/FeatureCard";
 import { BookMarked, Download, Heart, Layers, Search, Bot } from "lucide-react";
@@ -12,6 +12,7 @@ import Marquee from "../components/ui/Marquee";
 
 export default function Home() {
   const { user } = useUserAuthContext();
+  const navigate = useNavigate()
 
   useEffect(() => {
     const addUserToDb = async () => {
@@ -143,6 +144,12 @@ export default function Home() {
     setFormData({ name: "", email: "", message: "" });
   };
 
+  const handleGetStarted = () => {
+    console.log("Get Started clicked");
+
+    navigate(user ? "/explore" : "/login");
+  };
+
   return (
     <div className='bg-[url("/homebg.jpg")] bg-center bg-cover bg-fixed'>
       <Nav />
@@ -165,24 +172,25 @@ export default function Home() {
                   </p>
 
                   <div className="flex flex-col sm:flex-row gap-4">
-                    <button className="animate-fadeInDelayLong bg-light-accent p-4 rounded-md flex items-center w-40">
-                      <Link to={user ? "/explore" : "/login"}>Get Started</Link>
-                      <div>
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="#ffc107"
-                          viewBox="0 0 24 24"
-                          strokeWidth={1.5}
-                          stroke="currentColor"
-                          className="ml-2 h-5 w-5"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="m8.25 4.5 7.5 7.5-7.5 7.5"
-                          />
-                        </svg>
-                      </div>
+                    <button
+                      onClick={handleGetStarted}
+                      className="animate-fadeInDelayLong bg-light-accent p-4 rounded-md flex items-center"
+                    >
+                      Get Started
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="#ffc107"
+                        viewBox="0 0 24 24"
+                        strokeWidth={1.5}
+                        stroke="currentColor"
+                        className="ml-2 h-5 w-5"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="m8.25 4.5 7.5 7.5-7.5 7.5"
+                        />
+                      </svg>
                     </button>
                     {/* <button className="text-white border-white border-2 p-2 rounded-md hover:bg-white/10 animate-fadeInDelayLonger flex items-center">
                       <span>Learn More</span>

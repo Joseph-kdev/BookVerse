@@ -3,6 +3,7 @@ import { auth } from "./firebase-config";
 import { useEffect, useMemo, useState } from "react";
 import { userAuthContext } from "./UserAuthContext";
 import { User } from "../types";
+import { verifyTokenWithServer } from "../services/requests";
 
 export function UserAuthContextProvider({
   children,
@@ -12,7 +13,7 @@ export function UserAuthContextProvider({
   const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       if (currentUser) {
         const mappedUser: User = {
           uid: currentUser.uid,
@@ -22,6 +23,14 @@ export function UserAuthContextProvider({
           hasAccount: true,
         };
         setUser(mappedUser);
+
+        // Get ID token and send to server for verification
+        try {
+          const token = await currentUser.getIdToken();
+          await verifyTokenWithServer(token);
+        } catch (error) {
+          console.error("Error verifying token with server:", error);
+        }
       } else {
         setUser(null);
       }

@@ -17,6 +17,22 @@ const serverUrl: string = import.meta.env.VITE_SERVER_URL;
 const nyt_key = import.meta.env.VITE_NYT_API_KEY;
 const google_key = import.meta.env.VITE_BOOKS_API_KEY;
 
+let serverAuthToken: string | null = null;
+
+export const setServerAuthToken = (token: string | null) => {
+  serverAuthToken = token;
+};
+
+const authHeaders = () => {
+  if (!serverAuthToken) {
+    throw new Error("User is not authenticated");
+  }
+
+  return {
+    Authorization: `Bearer ${serverAuthToken}`,
+  };
+};
+
 export const getBestSellers = async (): Promise<BestSellers[]> => {
   try {
     const response = await axios.get(
@@ -44,6 +60,7 @@ export const searchBooks = async (query: string): Promise<GoogleBook[]> => {
     const response = await axios.get(
       `${googleBooksUrl}?q=${query}&api-key=${google_key}`
     );
+
     const foundBooks: GoogleBook[] = response.data.items.map(
       (item: {
         id: string;
@@ -87,24 +104,21 @@ export const getGenreBooks = async (genre: string): Promise<GoogleBook[]> => {
       `${serverUrl}/api/books/fetch_by_genre/${genre}`
     );
 
-    const foundBooks: GoogleBook[] = response.data.map(
-      (item:any) => ({
-        id: item.Books.id,
-        title: item.Books.title,
-        authors: item.Books.authors,
-        description: item.Books.description,
-        imageLinks: item.Books.imageLinks,
-        publisher: item.Books.publisher,
-        categories: item.Books.categories,
-        isbnValue: item.Books.isbnValue,
-      })
-    );
-
+    const foundBooks: GoogleBook[] = response.data.map((item: any) => ({
+      id: item.Books.id,
+      title: item.Books.title,
+      authors: item.Books.authors,
+      description: item.Books.description,
+      imageLinks: item.Books.imageLinks,
+      publisher: item.Books.publisher,
+      categories: item.Books.categories,
+      isbnValue: item.Books.isbnValue,
+    }));
 
     sessionStorage.setItem(`${genre}`, JSON.stringify(foundBooks));
     return foundBooks;
   } catch (error) {
-    throw new Error("Failed to fetch genre");
+    throw new Error(`Failed to fetch genre ${error}`);
   }
 };
 
@@ -119,6 +133,7 @@ export const getDownloadLinks = async (title: string): Promise<BookLinks[]> => {
     const response = await axios.get(
       `${serverUrl}/api/books/download_link?title=${title}`
     );
+
     const foundLinks: BookLinks[] = response.data.result.map(
       (link: {
         title: string;
@@ -138,6 +153,7 @@ export const getDownloadLinks = async (title: string): Promise<BookLinks[]> => {
         pages: link.pages,
       })
     );
+
     sessionStorage.setItem(`${title}`, JSON.stringify(foundLinks));
     return foundLinks;
   } catch (error) {
@@ -225,6 +241,7 @@ export const chatAboutBook = async ({
             } catch (error) {
               console.warn("Failed to parse SSE data:", error);
             }
+
             currentEvent = "";
           }
         }
@@ -238,35 +255,37 @@ export const chatAboutBook = async ({
   }
 };
 
-const getUser = async (userId: string) => {
+const getUser = async () => {
   try {
-    const response = await axios.get(
-      `${serverUrl}/api/users/get_user?userId=${userId}`
-    );
+    const response = await axios.get(`${serverUrl}/api/users/get_user`, {
+      headers: authHeaders(),
+    });
+
     return response.data;
   } catch (error) {
     return null;
   }
 };
 
-export const addUser = async ({
-  userId,
-  email,
-  displayName
-}: {
-  userId: string;
-  email: string | null;
-  displayName: string | null;
+export const addUser = async (_user?: {
+  userId?: string;
+  email?: string | null;
+  displayName?: string | null;
 }) => {
-  const foundUser = await getUser(userId);
+  const foundUser = await getUser();
+
   if (foundUser) {
     return foundUser;
   }
-  const response = await axios.post(`${serverUrl}/api/users/add_user`, {
-    userId: userId,
-    email: email,
-    displayName: displayName
-  });
+
+  const response = await axios.post(
+    `${serverUrl}/api/users/add_user`,
+    {},
+    {
+      headers: authHeaders(),
+    }
+  );
+
   return response.data;
 };
 
@@ -276,9 +295,10 @@ export const getBookFromDb = async (bookId: string) => {
       `${serverUrl}/api/books/get_book?bookId=${bookId}`
     );
 
-    if (response.status != 200) {
+    if (response.status !== 200) {
       return null;
     }
+
     return response.data;
   } catch (error) {
     console.log("Error finding book", error);
@@ -297,19 +317,28 @@ export const addBookToDb = async ({
   isbnValue,
 }: GoogleBook) => {
   const book = await getBookFromDb(id);
+
   if (book) {
     return book;
   }
-  const response = await axios.post(`${serverUrl}/api/books/add_book`, {
-    id,
-    title,
-    authors,
-    description,
-    imageLinks,
-    publisher,
-    categories,
-    isbnValue,
-  });
+
+  const response = await axios.post(
+    `${serverUrl}/api/books/add_book`,
+    {
+      id,
+      title,
+      authors,
+      description,
+      imageLinks,
+      publisher,
+      categories,
+      isbnValue,
+    },
+    {
+      headers: authHeaders(),
+    }
+  );
+
   console.log("added book to db", response);
   return response.data;
 };
@@ -319,21 +348,22 @@ export const saveBookToLibrary = async ({
   bookId,
   status,
 }: {
-  userId: string | undefined;
+  userId?: string;
   bookId: string;
   status: StatusEnum;
 }) => {
-  if (!userId) {
-    throw new Error("User not found");
-  }
   if (!bookId) {
     throw new Error("Book not found");
   }
 
   const response = await axios.post(
     `${serverUrl}/api/books/update_book_status`,
-    { userId, bookId, status }
+    { bookId, status },
+    {
+      headers: authHeaders(),
+    }
   );
+
   return response.data;
 };
 
@@ -341,20 +371,21 @@ export const removeBookFromLibrary = async ({
   userId,
   bookId,
 }: {
-  userId: string | undefined;
+  userId?: string;
   bookId: string;
 }) => {
-  if (!userId) {
-    throw new Error("User not found");
-  }
   if (!bookId) {
     throw new Error("Book not found");
   }
 
   const response = await axios.post(
     `${serverUrl}/api/books/remove_book_status`,
-    { userId, bookId }
+    { bookId },
+    {
+      headers: authHeaders(),
+    }
   );
+
   return response.data;
 };
 
@@ -362,19 +393,20 @@ export const checkStatus = async ({
   userId,
   bookId,
 }: {
-  userId: string;
+  userId?: string;
   bookId: string;
 }) => {
-  if (!userId) {
-    throw new Error("User not found");
-  }
   if (!bookId) {
     throw new Error("Book not found");
   }
 
   const response = await axios.get(
-    `${serverUrl}/api/books/check_status/${userId}/${bookId}`
+    `${serverUrl}/api/books/check_status/${bookId}`,
+    {
+      headers: authHeaders(),
+    }
   );
+
   return response.data;
 };
 
@@ -382,19 +414,21 @@ export const toggleFavorite = async ({
   userId,
   bookId,
 }: {
-  userId: string;
+  userId?: string;
   bookId: string;
 }) => {
-  if (!userId) {
-    throw new Error("User not found");
-  }
   if (!bookId) {
     throw new Error("Book not found");
   }
-  const response = await axios.post(`${serverUrl}/api/books/toggle_favorite`, {
-    userId,
-    bookId,
-  });
+
+  const response = await axios.post(
+    `${serverUrl}/api/books/toggle_favorite`,
+    { bookId },
+    {
+      headers: authHeaders(),
+    }
+  );
+
   return response.data;
 };
 
@@ -402,55 +436,105 @@ export const checkFavorite = async ({
   userId,
   bookId,
 }: {
-  userId: string;
+  userId?: string;
   bookId: string;
 }) => {
-  if (!userId) {
-    throw new Error("User not found");
-  }
   if (!bookId) {
     throw new Error("Book not found");
   }
+
   const response = await axios.get(
-    `${serverUrl}/api/books/check_favorite/${userId}/${bookId}`
+    `${serverUrl}/api/books/check_favorite/${bookId}`,
+    {
+      headers: authHeaders(),
+    }
   );
+
   return response.data;
 };
 
-export const getUserBooks = async(userId: string | undefined) => {
-  if(!userId) {
-    throw new Error("No user Id found");
+export const getUserBooks = async (_userId?: string) => {
+  const response = await axios.get(`${serverUrl}/api/books/get_user_books`, {
+    headers: authHeaders(),
+  });
+
+  return response.data;
+};
+
+export const getFavorites = async (_userId?: string) => {
+  const response = await axios.get(`${serverUrl}/api/books/get_favorites`, {
+    headers: authHeaders(),
+  });
+
+  return response.data;
+};
+
+export const postReview = async (review: Review) => {
+  const response = await axios.post(
+    `${serverUrl}/api/reviews`,
+    {
+      bookId: review.bookId,
+      reviewDesc: review.reviewDesc,
+      starRating: review.starRating,
+    },
+    {
+      headers: authHeaders(),
+    }
+  );
+
+  return response.data;
+};
+
+export const getReviews = async (bookId: string) => {
+  const response = await axios.get(`${serverUrl}/api/reviews/${bookId}`);
+  return response.data;
+};
+
+export const likeReview = async (reviewId: number) => {
+  const response = await axios.post(
+    `${serverUrl}/api/reviews/${reviewId}/like`,
+    {},
+    {
+      headers: authHeaders(),
+    }
+  );
+
+  return response.data;
+};
+
+export const unlikeReview = async (reviewId: number) => {
+  const response = await axios.post(
+    `${serverUrl}/api/reviews/${reviewId}/unlike`,
+    {},
+    {
+      headers: authHeaders(),
+    }
+  );
+
+  return response.data;
+};
+
+/**
+ * Sends Firebase ID token to the server for verification.
+ * Call this after Firebase login. The token is stored for later protected API calls.
+ */
+export const verifyTokenWithServer = async (token: string) => {
+  try {
+    const response = await axios.post(
+      `${serverUrl}/api/auth/verify-token`,
+      { token },
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    setServerAuthToken(token);
+    return response.data;
+  } catch (error) {
+    setServerAuthToken(null);
+    console.error("Failed to verify token with server:", error);
+    throw error;
   }
-  const response = await axios.get(`${serverUrl}/api/books/get_user_books/${userId}`)
-  return response.data
-}
-
-export const getFavorites = async(userId: string | undefined) => {
-  if(!userId) {
-    throw new Error("No user Id found")
-  }
-  const response = await axios.get(`${serverUrl}/api/books/get_favorites/${userId}`)
-  return response.data
-}
-
-export const postReview = async(review : Review) => {
-  const response = await axios.post(`${serverUrl}/api/reviews`, 
-    review
-  )
-  return response.data
-}
-
-export const getReviews = async(bookId: string) => {
-  const response = await axios.get(`${serverUrl}/api/reviews/${bookId}`)
-  return response.data
-}
-
-export const likeReview = async(reviewId: number) => {
-  const response = await axios.post(`${serverUrl}/api/reviews/${reviewId}/like`)
-  return response.data
-}
-
-export const unlikeReview = async(reviewId: number) => {
-  const response = await axios.post(`${serverUrl}/api/reviews/${reviewId}/unlike`)
-  return response.data
-}
+};
