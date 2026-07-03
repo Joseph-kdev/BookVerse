@@ -3,19 +3,15 @@ import {
   BestSellers,
   BookLinks,
   GoogleBook,
-  ImageLinks,
-  IndustryIdentifier,
   StatusEnum,
 } from "../types";
 import { Review } from "../components/Reviews";
 
 const bestSellersUrl: string = "https://api.nytimes.com/svc/books/v3/lists/";
-const googleBooksUrl: string = "https://www.googleapis.com/books/v1/volumes";
-const serverUrl: string = import.meta.env.VITE_SERVER_URL;
-// const serverUrl = "http://localhost:3001"
+// const serverUrl: string = import.meta.env.VITE_SERVER_URL;
+const serverUrl = "http://localhost:3001"
 
 const nyt_key = import.meta.env.VITE_NYT_API_KEY;
-const google_key = import.meta.env.VITE_BOOKS_API_KEY;
 
 let serverAuthToken: string | null = null;
 
@@ -55,37 +51,17 @@ export const getBestSellers = async (): Promise<BestSellers[]> => {
   }
 };
 
-export const searchBooks = async (query: string): Promise<GoogleBook[]> => {
+export const searchBooks = async (query: string): Promise<GoogleBook[] | null> => {
   try {
     const response = await axios.get(
-      `${googleBooksUrl}?q=${query}&api-key=${google_key}`
+      `${serverUrl}/api/books/search?book=${query}`
     );
 
-    const foundBooks: GoogleBook[] = response.data.items.map(
-      (item: {
-        id: string;
-        volumeInfo: {
-          title: string;
-          authors: string[];
-          description: string;
-          imageLinks: ImageLinks;
-          publisher: string;
-          categories: string[];
-          industryIdentifiers: IndustryIdentifier;
-        };
-      }) => ({
-        id: item.id,
-        title: item.volumeInfo.title,
-        authors: item.volumeInfo.authors,
-        description: item.volumeInfo.description,
-        imageLinks: item.volumeInfo.imageLinks,
-        publisher: item.volumeInfo.publisher,
-        categories: item.volumeInfo.categories,
-        isbnValue: item.volumeInfo.industryIdentifiers,
-      })
-    );
+    if (response.status !== 200) {
+      return null
+    }
 
-    return foundBooks;
+    return response.data
   } catch (error) {
     console.error("Error fetching books", error);
     throw new Error("Failed to fetch books");
