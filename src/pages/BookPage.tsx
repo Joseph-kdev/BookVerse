@@ -715,7 +715,11 @@ function BookDetails({ bookData }: { bookData: GoogleBook }) {
                 transition={{ bounce: 0 }}
                 className="absolute inset-0 rounded-lg"
               >
-                <BookChat title={bookData.title} author={bookData.authors[0]} />
+                <BookChat
+                  bookId={bookData.id}
+                  title={bookData.title}
+                  author={bookData.authors?.[0] ?? "Unknown author"}
+                />
               </motion.div>
             </div>
           </motion.div>
