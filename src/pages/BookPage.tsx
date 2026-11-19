@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useLocation, useParams } from "react-router-dom";
-import { GoogleBook, StatusEnum } from "../types";
+import { Link, useLocation, useParams } from "react-router-dom";
+import { GoogleBook, ReadingLinkAccess, StatusEnum } from "../types";
 import Nav from "../components/Nav";
 import { useUserAuthContext } from "../config/UserAuthContext";
 import { useQuery } from "@tanstack/react-query";
@@ -8,7 +8,8 @@ import {
   addBookToDb,
   checkFavorite,
   checkStatus,
-  getDownloadLinks,
+  getBookDetails,
+  getReadingLinks,
   removeBookFromLibrary,
   saveBookToLibrary,
   toggleFavorite,
@@ -17,8 +18,12 @@ import {
   BookCheckIcon,
   BookmarkPlusIcon,
   BookOpenTextIcon,
+  BookOpen,
   Bot,
   Download,
+  ExternalLink,
+  Eye,
+  Library as LibraryIcon,
 } from "lucide-react";
 import BookChat from "../components/Chat";
 import { ClockLoader } from "react-spinners";
@@ -31,10 +36,77 @@ import {
 import { useOnClickOutside } from "usehooks-ts";
 import Reviews from "../components/Reviews";
 
+const accessIcon: Record<ReadingLinkAccess, React.ReactNode> = {
+  download: <Download size={18} color="#ffc107" />,
+  read: <BookOpen size={18} color="#ffc107" />,
+  borrow: <LibraryIcon size={18} color="#ffc107" />,
+  preview: <Eye size={18} color="#ffc107" />,
+};
+
+const accessLabel: Record<ReadingLinkAccess, string> = {
+  download: "Free download",
+  read: "Read free online",
+  borrow: "Borrow free",
+  preview: "Preview",
+};
+
+/**
+ * Resolves the book for /book/:id.
+ * Uses the router state when navigating from a book card, otherwise loads the
+ * book from the server so refreshes and shared links work.
+ */
 export default function BookPage() {
-  const { title } = useParams();
+  const { id } = useParams();
   const location = useLocation();
-  const bookData = location.state as GoogleBook;
+  const stateBook = location.state as GoogleBook | null;
+  const hasStateBook = !!stateBook?.id && stateBook.id === id;
+
+  const {
+    data: fetchedBook,
+    isError,
+    isFetching,
+  } = useQuery({
+    queryKey: ["book-details", id],
+    queryFn: () => getBookDetails(id as string),
+    enabled: !!id && !hasStateBook,
+    staleTime: 1000 * 60 * 10,
+  });
+
+  const book = hasStateBook ? stateBook : fetchedBook;
+
+  if (book) {
+    return <BookDetails key={book.id} bookData={book} />;
+  }
+
+  return (
+    <div className="bg-light-background dark:bg-dark-background min-h-screen">
+      <Nav />
+      <div className="flex flex-col items-center justify-center mt-20 px-4 text-center">
+        {isFetching ? (
+          <ClockLoader size={30} color="#9a5000" />
+        ) : (
+          <>
+            <img src="/sad-pup.svg" width={120} alt="" />
+            <p className="font-Oxanium mt-3 text-light-text dark:text-dark-text">
+              {isError
+                ? "We couldn't load this book. Please try again."
+                : "We couldn't find this book."}
+            </p>
+            <Link
+              to="/search"
+              className="mt-4 bg-light-accent dark:bg-dark-accent px-4 py-2 rounded-md font-Tilt_Neon text-dark-background"
+            >
+              Search for books
+            </Link>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function BookDetails({ bookData }: { bookData: GoogleBook }) {
+  const title = bookData.title;
   const [bookInCollection, setBookInCollection] = useState({
     reading_list: false,
     completed: false,
@@ -52,16 +124,9 @@ export default function BookPage() {
     newStatus: React.SetStateAction<string>,
     statusType: StatusEnum
   ) => {
-    try {
-      setloading(true);
-      await toggleBookLibrary(statusType, "add");
-      setStatus(newStatus);
-      setIsOpen(false);
-    } catch (error: any) {
-      setError(error);
-    } finally {
-      setloading(false);
-    }
+    await toggleBookLibrary(statusType, "add");
+    setStatus(newStatus);
+    setIsOpen(false);
   };
 
   useEffect(() => {
@@ -151,7 +216,13 @@ export default function BookPage() {
           bookId: bookData.id,
           status: status,
         });
-        setBookInCollection((prev) => ({ ...prev, [status]: true }));
+        setBookInCollection((prev) => ({
+          ...prev,
+          reading_list: false,
+          reading: false,
+          completed: false,
+          [status]: true,
+        }));
         toast.success(`${bookData.title} added to ${status}`, {
           duration: 2000,
           position: "top-center",
@@ -164,7 +235,6 @@ export default function BookPage() {
         await removeBookFromLibrary({
           userId: user.uid,
           bookId: bookData.id,
-          status: status,
         });
         setBookInCollection((prev) => ({ ...prev, [status]: false }));
         toast.success(`${bookData.title} removed from ${status}`, {
@@ -179,7 +249,7 @@ export default function BookPage() {
     }
   };
 
-  const handleFavorite = async (userId: string, bookId: string) => {
+  const handleFavorite = async (userId: string | undefined, bookId: string) => {
     if (!userId) {
       toast.error("You have to be logged in!!", {
         duration: 3000,
@@ -227,8 +297,9 @@ export default function BookPage() {
   };
   //check if the book is in the user's library
   useEffect(() => {
+    if (!user) return;
+
     const checkBookExistence = async () => {
-      if (!user) return;
       const bookQuery = await checkStatus({
         userId: user.uid as string,
         bookId: bookData.id,
@@ -251,12 +322,19 @@ export default function BookPage() {
       setBookInCollection((prev) => ({ ...prev, favorite: true }));
     };
 
-    checkBookExistence();
-    checkBookFavorite();
+    checkBookExistence().catch((error) =>
+      console.error("Error checking book status", error)
+    );
+    checkBookFavorite().catch((error) =>
+      console.error("Error checking favorite", error)
+    );
   }, [user, bookData.id]);
 
   // Add this useEffect after your existing ones
+  // Save the book so it can be reviewed / added to the library.
+  // The endpoint requires a signed-in user.
   useEffect(() => {
+    if (!user) return;
     addBookToDb({
       id: bookData.id,
       title: bookData.title,
@@ -266,18 +344,18 @@ export default function BookPage() {
       publisher: bookData.publisher,
       categories: bookData.categories,
       isbnValue: bookData.isbnValue || [],
-    });
-  }, []);
+    }).catch((error) => console.error("Error saving book", error));
+  }, [user, bookData.id]);
 
-  //fetch download links
+  // Legal reading / download links with a Google Books preview fallback
   const {
-    data: links,
+    data: readingLinks,
     isLoading,
     isError,
   } = useQuery({
-    queryKey: [`${title}`],
-    queryFn: () => getDownloadLinks(bookData.title),
-    initialData: [],
+    queryKey: ["reading-links", bookData.id],
+    queryFn: () => getReadingLinks(bookData),
+    staleTime: 1000 * 60 * 60,
   });
 
   const variants = {
@@ -360,7 +438,7 @@ export default function BookPage() {
             >
               Author(s):{" "}
               {bookData.authors?.map((a) => (
-                <span>{a}{" "}</span>
+                <span key={a}>{a}{" "}</span>
               ))}
             </motion.p>
             <motion.p
@@ -397,12 +475,12 @@ export default function BookPage() {
                 delay: 0.7,
               }}
             >
-              <p className="my-2 font-Tilt_Neon text-lg">Download links</p>
+              <p className="my-2 font-Tilt_Neon text-lg">Read or download</p>
               {isLoading ? (
                 <div className="w-[100%] h-20 flex justify-center items-center">
                   <ClockLoader size={25} color="#9a5000" />
                 </div>
-              ) : isError ? (
+              ) : isError || !readingLinks ? (
                 <div className="flex flex-col items-center mt-4">
                   <img src="/sad-pup.svg" width={100} alt="" />
                   <p className="text-sm font-Oxanium mt-1 text-red-500">
@@ -410,56 +488,45 @@ export default function BookPage() {
                   </p>
                 </div>
               ) : (
-                <div className="">
-                  <div className="shadow-lg rounded-lg">
-                    <table className="w-full bg-light-background border-collapse">
-                      <thead>
-                        <tr className="bg-light-background border-b border-gray-200">
-                          <th className="px-2 py-2 text-left text-sm text-gray-900 tracking-wider">
-                            Links
-                          </th>
-                          <th className="px-6 py-2 text-left text-sm text-gray-900  tracking-wider">
-                            Format
-                          </th>
-                          <th className="px-2 py-2 text-left text-sm text-gray-900  tracking-wider">
-                            Size
-                          </th>
-                          <th className="px-2 py-2 text-center text-sm text-gray-900  tracking-wider">
-                            Download
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-gray-200">
-                        {links.map((link, index) => (
-                          <tr
-                            key={index}
-                            className="hover:bg-gray-50 transition-colors duration-150"
-                          >
-                            <td className="px-2 py-4 text-sm text-gray-900">
-                              Link {index + 1}
-                            </td>
-                            <td className="px-6 py-4 text-sm text-gray-700">
-                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-light-secondary text-dark-text">
-                                {link.format}
-                              </span>
-                            </td>
-                            <td className="px-4 py-4 text-sm text-light-text">
-                              {link.size}
-                            </td>
-                            <td className="px-4 py-4 text-center">
-                              <a
-                                href={link.link}
-                                className="inline-flex items-center justify-center p-2 rounded-full bg-light-primary"
-                                target="_blank"
-                              >
-                                <Download size={20} color="#ffc107" />
-                              </a>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
+                <div>
+                  {readingLinks.isFallback && (
+                    <p className="text-xs font-Oxanium mb-2 opacity-80">
+                      This book isn't available for free from public-domain or
+                      library sources, but you can preview it on Google Books.
+                    </p>
+                  )}
+                  <ul className="shadow-lg rounded-lg bg-light-background divide-y divide-gray-200">
+                    {readingLinks.links.map((link) => (
+                      <li key={link.url}>
+                        <a
+                          href={link.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-3 px-3 py-3 hover:bg-gray-50 transition-colors duration-150"
+                        >
+                          <span className="inline-flex items-center justify-center p-2 rounded-full bg-light-primary shrink-0">
+                            {accessIcon[link.access]}
+                          </span>
+                          <span className="flex-1 min-w-0">
+                            <span className="block text-sm text-gray-900">
+                              {link.label}
+                            </span>
+                            <span className="block text-xs text-gray-600">
+                              {link.source} · {link.format}
+                            </span>
+                          </span>
+                          <span className="hidden sm:inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-light-secondary text-dark-text">
+                            {accessLabel[link.access]}
+                          </span>
+                          <ExternalLink size={16} className="text-gray-500 shrink-0" />
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                  <p className="text-[11px] font-Oxanium mt-2 opacity-70">
+                    Links go to Project Gutenberg, Standard Ebooks, the Internet
+                    Archive, Open Library and Google Books.
+                  </p>
                 </div>
               )}
             </motion.div>
