@@ -23,7 +23,7 @@ export interface GoogleBook {
     imageLinks?: ImageLinks;
     publisher?: string;
     categories: string[];
-    isbnValue: IndustryIdentifier[] | null;
+    isbnValue: (IndustryIdentifier | string)[] | null;
 }
 
 export interface User {
@@ -40,14 +40,20 @@ export interface Genres {
     "other-genres": string[]
 }
 
-export interface BookLinks {
-    title: string;
-    publisher: string;
-    year: string;
+export type ReadingLinkAccess = "download" | "read" | "borrow" | "preview";
+
+export interface ReadingLink {
+    source: string;
+    access: ReadingLinkAccess;
     format: string;
-    link: string;
-    size: string;
-    pages: string;
+    url: string;
+    label: string;
+}
+
+export interface ReadingLinksResult {
+    links: ReadingLink[];
+    /** true when no free legal source was found and only a Google Books preview is returned */
+    isFallback: boolean;
 }
 
 export type StatusEnum = "reading" | "reading_list" | "completed";

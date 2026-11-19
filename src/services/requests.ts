@@ -1,11 +1,12 @@
 import axios from "axios";
 import {
   BestSellers,
-  BookLinks,
   GoogleBook,
+  ReadingLinksResult,
   StatusEnum,
 } from "../types";
 import { Review } from "../components/Reviews";
+import { auth } from "../config/firebase-config";
 
 const bestSellersUrl: string = "https://api.nytimes.com/svc/books/v3/lists/";
 const serverUrl: string = import.meta.env.VITE_SERVER_URL;
@@ -13,19 +14,26 @@ const serverUrl: string = import.meta.env.VITE_SERVER_URL;
 
 const nyt_key = import.meta.env.VITE_NYT_API_KEY;
 
-let serverAuthToken: string | null = null;
+/**
+ * Builds the Authorization header for protected endpoints.
+ *
+ * Firebase ID tokens expire after one hour, so instead of caching the token
+ * once at login we ask Firebase for it on every request. `getIdToken()` returns
+ * the cached token and transparently refreshes it when it is about to expire.
+ * `authStateReady()` waits for Firebase to restore a persisted session on page
+ * load, which avoids "User is not authenticated" errors from early requests.
+ */
+const authHeaders = async () => {
+  await auth.authStateReady();
+  const currentUser = auth.currentUser;
 
-export const setServerAuthToken = (token: string | null) => {
-  serverAuthToken = token;
-};
-
-const authHeaders = () => {
-  if (!serverAuthToken) {
+  if (!currentUser) {
     throw new Error("User is not authenticated");
   }
 
+  const token = await currentUser.getIdToken();
   return {
-    Authorization: `Bearer ${serverAuthToken}`,
+    Authorization: `Bearer ${token}`,
   };
 };
 
@@ -54,7 +62,7 @@ export const getBestSellers = async (): Promise<BestSellers[]> => {
 export const searchBooks = async (query: string): Promise<GoogleBook[] | null> => {
   try {
     const response = await axios.get(
-      `${serverUrl}/api/books/search?book=${query}`
+      `${serverUrl}/api/books/search?book=${encodeURIComponent(query)}`
     );
 
     if (response.status !== 200) {
@@ -77,7 +85,7 @@ export const getGenreBooks = async (genre: string): Promise<GoogleBook[]> => {
     }
 
     const response = await axios.get(
-      `${serverUrl}/api/books/fetch_by_genre/${genre}`
+      `${serverUrl}/api/books/fetch_by_genre/${encodeURIComponent(genre)}`
     );
 
     const foundBooks: GoogleBook[] = response.data.map((item: any) => ({
@@ -98,42 +106,56 @@ export const getGenreBooks = async (genre: string): Promise<GoogleBook[]> => {
   }
 };
 
-export const getDownloadLinks = async (title: string): Promise<BookLinks[]> => {
-  try {
-    const downloadLinks = sessionStorage.getItem(`${title}`);
+/**
+ * Legal free reading/download links (Project Gutenberg, Standard Ebooks,
+ * Internet Archive, Open Library, public-domain Google Books), falling back
+ * to a Google Books preview when none are available.
+ */
+export const getReadingLinks = async (
+  book: Pick<GoogleBook, "id" | "title" | "authors" | "isbnValue">
+): Promise<ReadingLinksResult> => {
+  const cacheKey = `reading-links-${book.id}`;
+  const cached = sessionStorage.getItem(cacheKey);
 
-    if (downloadLinks) {
-      return JSON.parse(downloadLinks);
+  if (cached) {
+    return JSON.parse(cached);
+  }
+
+  const isbns = (book.isbnValue ?? [])
+    .map((value) => (typeof value === "string" ? value : value?.identifier))
+    .filter(Boolean)
+    .join(",");
+
+  const response = await axios.get<ReadingLinksResult>(
+    `${serverUrl}/api/books/reading_links/${encodeURIComponent(book.id)}`,
+    {
+      params: {
+        title: book.title,
+        author: book.authors?.[0],
+        isbn: isbns || undefined,
+      },
     }
+  );
 
+  sessionStorage.setItem(cacheKey, JSON.stringify(response.data));
+  return response.data;
+};
+
+/**
+ * Loads a book by its Google Books volume id (database first, then Google).
+ * Used when the book page is opened directly, refreshed or shared.
+ */
+export const getBookDetails = async (bookId: string): Promise<GoogleBook | null> => {
+  try {
     const response = await axios.get(
-      `${serverUrl}/api/books/download_link?title=${title}`
+      `${serverUrl}/api/books/details/${encodeURIComponent(bookId)}`
     );
-
-    const foundLinks: BookLinks[] = response.data.result.map(
-      (link: {
-        title: string;
-        publisher: string;
-        year: string;
-        format: string;
-        link: string;
-        size: string;
-        pages: string;
-      }) => ({
-        title: link.title,
-        publisher: link.publisher,
-        year: link.year,
-        format: link.format,
-        link: link.link,
-        size: link.size,
-        pages: link.pages,
-      })
-    );
-
-    sessionStorage.setItem(`${title}`, JSON.stringify(foundLinks));
-    return foundLinks;
+    return response.data;
   } catch (error) {
-    throw new Error("Failed to fetch links");
+    if (axios.isAxiosError(error) && error.response?.status === 404) {
+      return null;
+    }
+    throw error;
   }
 };
 
@@ -234,7 +256,7 @@ export const chatAboutBook = async ({
 const getUser = async () => {
   try {
     const response = await axios.get(`${serverUrl}/api/users/get_user`, {
-      headers: authHeaders(),
+      headers: await authHeaders(),
     });
 
     return response.data;
@@ -258,7 +280,7 @@ export const addUser = async (_user?: {
     `${serverUrl}/api/users/add_user`,
     {},
     {
-      headers: authHeaders(),
+      headers: await authHeaders(),
     }
   );
 
@@ -268,7 +290,7 @@ export const addUser = async (_user?: {
 export const getBookFromDb = async (bookId: string) => {
   try {
     const response = await axios.get(
-      `${serverUrl}/api/books/get_book?bookId=${bookId}`
+      `${serverUrl}/api/books/get_book?bookId=${encodeURIComponent(bookId)}`
     );
 
     if (response.status !== 200) {
@@ -311,7 +333,7 @@ export const addBookToDb = async ({
       isbnValue,
     },
     {
-      headers: authHeaders(),
+      headers: await authHeaders(),
     }
   );
 
@@ -336,7 +358,7 @@ export const saveBookToLibrary = async ({
     `${serverUrl}/api/books/update_book_status`,
     { bookId, status },
     {
-      headers: authHeaders(),
+      headers: await authHeaders(),
     }
   );
 
@@ -358,7 +380,7 @@ export const removeBookFromLibrary = async ({
     `${serverUrl}/api/books/remove_book_status`,
     { bookId },
     {
-      headers: authHeaders(),
+      headers: await authHeaders(),
     }
   );
 
@@ -379,7 +401,7 @@ export const checkStatus = async ({
   const response = await axios.get(
     `${serverUrl}/api/books/check_status/${bookId}`,
     {
-      headers: authHeaders(),
+      headers: await authHeaders(),
     }
   );
 
@@ -401,7 +423,7 @@ export const toggleFavorite = async ({
     `${serverUrl}/api/books/toggle_favorite`,
     { bookId },
     {
-      headers: authHeaders(),
+      headers: await authHeaders(),
     }
   );
 
@@ -422,7 +444,7 @@ export const checkFavorite = async ({
   const response = await axios.get(
     `${serverUrl}/api/books/check_favorite/${bookId}`,
     {
-      headers: authHeaders(),
+      headers: await authHeaders(),
     }
   );
 
@@ -431,7 +453,7 @@ export const checkFavorite = async ({
 
 export const getUserBooks = async (_userId?: string) => {
   const response = await axios.get(`${serverUrl}/api/books/get_user_books`, {
-    headers: authHeaders(),
+    headers: await authHeaders(),
   });
 
   return response.data;
@@ -439,7 +461,7 @@ export const getUserBooks = async (_userId?: string) => {
 
 export const getFavorites = async (_userId?: string) => {
   const response = await axios.get(`${serverUrl}/api/books/get_favorites`, {
-    headers: authHeaders(),
+    headers: await authHeaders(),
   });
 
   return response.data;
@@ -454,7 +476,7 @@ export const postReview = async (review: Review) => {
       starRating: review.starRating,
     },
     {
-      headers: authHeaders(),
+      headers: await authHeaders(),
     }
   );
 
@@ -471,7 +493,7 @@ export const likeReview = async (reviewId: number) => {
     `${serverUrl}/api/reviews/${reviewId}/like`,
     {},
     {
-      headers: authHeaders(),
+      headers: await authHeaders(),
     }
   );
 
@@ -483,7 +505,7 @@ export const unlikeReview = async (reviewId: number) => {
     `${serverUrl}/api/reviews/${reviewId}/unlike`,
     {},
     {
-      headers: authHeaders(),
+      headers: await authHeaders(),
     }
   );
 
@@ -492,7 +514,8 @@ export const unlikeReview = async (reviewId: number) => {
 
 /**
  * Sends Firebase ID token to the server for verification.
- * Call this after Firebase login. The token is stored for later protected API calls.
+ * Call this after Firebase login so the user record is created/updated on the server.
+ * Protected requests fetch a fresh token themselves (see authHeaders).
  */
 export const verifyTokenWithServer = async (token: string) => {
   try {
@@ -506,10 +529,8 @@ export const verifyTokenWithServer = async (token: string) => {
       }
     );
 
-    setServerAuthToken(token);
     return response.data;
   } catch (error) {
-    setServerAuthToken(null);
     console.error("Failed to verify token with server:", error);
     throw error;
   }

@@ -55,9 +55,9 @@ export default function Home() {
       image: "find.jpg",
     },
     {
-      title: "Download & Access Easily",
+      title: "Read Free, Legally",
       description:
-        "Get free download links for books—no more hunting across sketchy sites.",
+        "Find free, legal copies from Project Gutenberg, Standard Ebooks and the Internet Archive, or preview any book on Google Books.",
       icon: Download,
       image: "download.jpg",
     },

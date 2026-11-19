@@ -103,7 +103,7 @@ export default function Book({
             </div>
             <motion.div initial={{scale: 0.9}} animate={{scale: 1}} exit={{scale: 0.9}} whileTap={{ scale: 0.95 }} className="w-full mt-4">
               <Link
-                to={`/book/${title}`}
+                to={`/book/${encodeURIComponent(id)}`}
                 state={{
                   id,
                   title,

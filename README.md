@@ -1,6 +1,6 @@
 # BookVerse
 
-BookVerse is a modern web application designed to revolutionize your digital reading experience. It serves as your personal digital bookshelf, allowing you to discover, organize, and download books, as well as leverage AI-powered insights and recommendations for each title.
+BookVerse is a modern web application designed to revolutionize your digital reading experience. It serves as your personal digital bookshelf, allowing you to discover, organize, and read books from legal free sources, as well as leverage AI-powered insights and recommendations for each title.
 
 #### Live preview
 <https://bookvs.pages.dev/>
@@ -9,7 +9,7 @@ BookVerse is a modern web application designed to revolutionize your digital rea
 
 - **Personalized Digital Bookshelf:** Track your reading list, mark books as finished, and manage your favorites.
 - **Book Discovery by Genre:** Easily explore and discover books by genres and categories.
-- **Instant Download Links:** Get free download links for books without searching through unreliable sources.
+- **Legal Reading Links:** Free, legal copies from Project Gutenberg, Standard Ebooks, the Internet Archive and Open Library, with a Google Books preview fallback.
 - **Built-in Book Assistant:** Each book page features an AI chatbot that provides summaries, insights, and tailored recommendations.
 - **Seamless User Authentication:** Securely manage your book collections with user authentication.
 
@@ -18,7 +18,7 @@ BookVerse is a modern web application designed to revolutionize your digital rea
 - **Frontend:** React, TypeScript, Vite
 - **Styling:** Tailwind CSS
 - **State/Data Management:** @tanstack/react-query, React Context API
-- **APIs:** Google Books API (for books and metadata), Consumet API for download links and the new Google GEN-AI SDK for the chatbot.
+- **APIs:** Google Books API (for books and metadata), Open Library (Project Gutenberg, Standard Ebooks and Internet Archive links) and the new Google GEN-AI SDK for the chatbot.
 - **Authentication & Storage:** Firebase
 - **Other Libraries:**
   - `axios` (API requests)
