@@ -159,11 +159,29 @@ export const getBookDetails = async (bookId: string): Promise<GoogleBook | null>
   }
 };
 
+export interface ChatTurn {
+  role: "user" | "assistant";
+  content: string;
+}
+
+const describeRetryAfter = (seconds: number) => {
+  if (seconds < 90) return `${seconds} seconds`;
+  const minutes = Math.ceil(seconds / 60);
+  if (minutes < 90) return `${minutes} minutes`;
+  return `${Math.ceil(minutes / 60)} hours`;
+};
+
+/**
+ * Streams a reply from the book assistant.
+ * The server is stateless: the conversation lives on the client and the
+ * previous turns are sent as `history` with every message.
+ */
 export const chatAboutBook = async ({
   title,
   author,
   message,
-  sessionId,
+  history,
+  signal,
   onChunk,
   onComplete,
   onError,
@@ -171,8 +189,9 @@ export const chatAboutBook = async ({
   title: string;
   author: string;
   message: string;
-  sessionId: string;
-  onChunk: (text: string, sessionId: string) => void;
+  history: ChatTurn[];
+  signal?: AbortSignal;
+  onChunk: (text: string) => void;
   onComplete: () => void;
   onError: (error: string) => void;
 }) => {
@@ -181,12 +200,32 @@ export const chatAboutBook = async ({
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        ...(await authHeaders()),
       },
-      body: JSON.stringify({ title, author, message, sessionId }),
+      body: JSON.stringify({ title, author, message, history }),
+      signal,
     });
 
     if (!response.ok) {
-      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      let serverMessage = "";
+      try {
+        serverMessage = (await response.json())?.error ?? "";
+      } catch {
+        // response wasn't JSON
+      }
+
+      if (response.status === 401) {
+        throw new Error("Please log in again to chat about this book.");
+      }
+      if (response.status === 429) {
+        const retryAfter = Number(response.headers.get("Retry-After"));
+        throw new Error(
+          Number.isFinite(retryAfter) && retryAfter > 0
+            ? `You're sending messages too quickly. Try again in ${describeRetryAfter(retryAfter)}.`
+            : serverMessage || "You're sending messages too quickly. Please try again later."
+        );
+      }
+      throw new Error(serverMessage || `HTTP ${response.status}: ${response.statusText}`);
     }
 
     const contentType = response.headers.get("Content-Type");
@@ -233,8 +272,8 @@ export const chatAboutBook = async ({
               } else if (currentEvent === "error") {
                 onError(data.error || "Stream error occurred");
                 return;
-              } else if (data.text && data.sessionId) {
-                onChunk(data.text, data.sessionId);
+              } else if (data.text) {
+                onChunk(data.text);
               }
             } catch (error) {
               console.warn("Failed to parse SSE data:", error);
@@ -247,7 +286,11 @@ export const chatAboutBook = async ({
     } finally {
       reader.releaseLock();
     }
+
+    // Stream closed without an explicit end event.
+    onComplete();
   } catch (error) {
+    if (signal?.aborted) return;
     console.log("Error in chat", error);
     onError(error instanceof Error ? error.message : "Unknown error occurred");
   }
